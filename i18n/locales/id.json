@@ -3,6 +3,8 @@
     "home": "Beranda",
     "about": "Tentang Kami",
     "activities": "Kegiatan",
+    "sku": "SKU",
+    "skk": "SKK",
     "members": "Struktur Ambalan",
     "contact": "Kontak",
     "cta": "Masuk"
@@ -12,6 +14,8 @@
     "explore": "Jelajahi",
     "aboutHistory": "Sejarah Pramuka",
     "latestActivities": "Kegiatan Terbaru",
+    "sku": "SKU Penegak",
+    "skk": "SKK & TKK",
     "organization": "Organisasi",
     "ambalanHierarchy": "Struktur Ambalan",
     "dewanAmbalan": "Dewan Ambalan",
@@ -142,6 +146,104 @@
     "contact": {
       "title": "Hubungi Pramuka SMANPAS",
       "description": "Kontak resmi Pramuka SMA Negeri 1 Pasawahan (SMANPAS). Kirim pesan untuk kolaborasi, pendaftaran anggota baru, atau pertanyaan umum."
+    },
+    "sku": {
+      "title": "SKU Penegak SMANPAS",
+      "description": "Syarat Kecakapan Umum (SKU) tingkat Penegak Bantara dan Laksana Pramuka SMA Negeri 1 Pasawahan."
+    },
+    "skk": {
+      "title": "SKK & TKK Pramuka SMANPAS",
+      "description": "Syarat Kecakapan Khusus (SKK) dan Tanda Kecakapan Khusus (TKK) Pramuka SMA Negeri 1 Pasawahan."
+    }
+  },
+  "sku": {
+    "header": {
+      "badge": "Syarat Kecakapan Umum",
+      "title": "SKU Penegak",
+      "description": "Syarat Kecakapan Umum (SKU) tingkat Penegak. Selesaikan setiap butir untuk mengukuhkan kecakapan dan naik tingkat."
+    },
+    "levels": {
+      "bantara": "Penegak Bantara",
+      "laksana": "Penegak Laksana"
+    },
+    "categories": {
+      "all": "Semua",
+      "spiritual": "Keagamaan/Spiritual",
+      "social": "Sosial & Emosional",
+      "skill": "Keterampilan/Intelektual",
+      "physical": "Fisik & Lingkungan"
+    },
+    "progress": {
+      "title": "Progres Verifikasi",
+      "login_hint": "Masuk untuk mengajukan ujian dan melacak progres verifikasi Anda."
+    },
+    "status": {
+      "not_tested": "Belum Diuji",
+      "pending": "Menunggu Verifikasi",
+      "verified": "Lulus / Terverifikasi",
+      "rejected": "Perlu Revisi"
+    },
+    "card": {
+      "submit": "Ajukan Ujian",
+      "resubmit": "Ajukan Ulang",
+      "evidence": "Lihat bukti",
+      "examiner_notes": "Catatan Penguji",
+      "login_prompt": "Masuk untuk mengajukan ujian"
+    },
+    "empty": "Belum ada butir SKU untuk filter ini.",
+    "dialog": {
+      "title": "Ajukan Ujian SKU",
+      "notes": "Catatan / Keterangan",
+      "notes_placeholder": "Jelaskan kesiapan dan bukti pemenuhan butir ini...",
+      "evidence": "URL Bukti (opsional)",
+      "cancel": "Batal",
+      "submit": "Kirim Pengajuan",
+      "sending": "Mengirim...",
+      "success": "Pengajuan ujian berhasil dikirim",
+      "error": "Gagal mengirim pengajuan"
+    }
+  },
+  "skk": {
+    "header": {
+      "badge": "Syarat Kecakapan Khusus",
+      "title": "SKK & Tanda Kecakapan Khusus",
+      "description": "Kembangkan minat dan bakat melalui Syarat Kecakapan Khusus (SKK). Setiap TKK memiliki tiga tingkatan: Purwa, Madya, dan Utama."
+    },
+    "fields": {
+      "all": "Semua Bidang",
+      "kuning": "Kuning — Agama & Moral",
+      "merah": "Merah — Patriotisme & Seni",
+      "putih": "Putih — Kesehatan & Ketangkasan",
+      "hijau": "Hijau — Keterampilan & Pembangunan",
+      "biru": "Biru — Sosial & Kemanusiaan"
+    },
+    "levels": {
+      "purwa": "Purwa",
+      "madya": "Madya",
+      "utama": "Utama"
+    },
+    "status": {
+      "not_tested": "Belum Diuji",
+      "pending": "Menunggu Verifikasi",
+      "verified": "Lulus / Terverifikasi",
+      "rejected": "Perlu Revisi"
+    },
+    "card": {
+      "mandatory": "TKK Wajib",
+      "evidence": "Lihat bukti",
+      "login_prompt": "Masuk untuk mengajukan verifikasi"
+    },
+    "empty": "Belum ada TKK untuk bidang ini.",
+    "dialog": {
+      "requirements": "Syarat Kecakapan",
+      "notes": "Catatan / Keterangan",
+      "notes_placeholder": "Jelaskan pengalaman dan bukti pemenuhan syarat ini...",
+      "evidence": "URL Bukti (opsional)",
+      "submit": "Ajukan Verifikasi",
+      "sending": "Mengirim...",
+      "examiner_notes": "Catatan Penguji",
+      "success": "Pengajuan verifikasi berhasil dikirim",
+      "error": "Gagal mengirim pengajuan"
     }
   },
   "twibbon": {

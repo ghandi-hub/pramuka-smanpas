@@ -27,6 +27,8 @@ const links = computed(() => [
   { name: t('nav.home'), path: localePath('/') },
   { name: t('nav.about'), path: localePath('/about') },
   { name: t('nav.activities'), path: localePath('/activities') },
+  { name: t('nav.sku'), path: localePath('/sku') },
+  { name: t('nav.skk'), path: localePath('/skk') },
   { name: t('nav.members'), path: localePath('/members') },
   { name: t('nav.contact'), path: localePath('/contact') },
 ])

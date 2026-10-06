@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Chef Hat -->
+  <path d="M30,46 C20,44 18,30 28,24 C28,14 42,10 50,16 C58,10 72,14 72,24 C82,30 80,44 70,46 Z" fill="#ffffff" stroke="#14532d" stroke-width="2.5" />
+  <rect x="28" y="46" width="44" height="12" rx="2" fill="#ffffff" stroke="#14532d" stroke-width="2.5" />
+  <line x1="36" y1="46" x2="36" y2="58" stroke="#86efac" stroke-width="1.5" />
+  <line x1="50" y1="46" x2="50" y2="58" stroke="#86efac" stroke-width="1.5" />
+  <line x1="64" y1="46" x2="64" y2="58" stroke="#86efac" stroke-width="1.5" />
+  <!-- Frying Pan & Spoon -->
+  <ellipse cx="48" cy="74" rx="26" ry="12" fill="#dcfce7" stroke="#14532d" stroke-width="2.5" />
+  <line x1="74" y1="74" x2="90" y2="82" stroke="#14532d" stroke-width="4" stroke-linecap="round" />
+  <!-- Steam curls -->
+  <path d="M42,66 Q40,62 44,58" stroke="#16a34a" stroke-width="1.5" fill="none" />
+  <path d="M52,66 Q54,62 50,58" stroke="#16a34a" stroke-width="1.5" fill="none" />
+</svg>

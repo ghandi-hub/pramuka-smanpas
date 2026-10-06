@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Marching / Hiking Boots silhouette & footsteps -->
+  <!-- Lead Boot -->
+  <path d="M30,38 L42,38 L42,54 L58,54 C64,54 68,58 68,64 L68,68 L24,68 L24,44 C24,40 26,38 30,38 Z" fill="#e2e8f0" stroke="#334155" stroke-width="2.5" stroke-linejoin="round" />
+  <!-- Sole tread -->
+  <line x1="22" y1="68" x2="70" y2="68" stroke="#0f172a" stroke-width="4" stroke-linecap="round" />
+  <line x1="28" y1="68" x2="28" y2="72" stroke="#0f172a" stroke-width="2" />
+  <line x1="38" y1="68" x2="38" y2="72" stroke="#0f172a" stroke-width="2" />
+  <line x1="52" y1="68" x2="52" y2="72" stroke="#0f172a" stroke-width="2" />
+  <line x1="64" y1="68" x2="64" y2="72" stroke="#0f172a" stroke-width="2" />
+  <!-- Boot Laces -->
+  <line x1="32" y1="44" x2="40" y2="44" stroke="#dc2626" stroke-width="2" />
+  <line x1="32" y1="48" x2="40" y2="48" stroke="#dc2626" stroke-width="2" />
+  <line x1="32" y1="52" x2="40" y2="52" stroke="#dc2626" stroke-width="2" />
+  <!-- Motion Trail lines behind -->
+  <path d="M14,48 L20,48" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
+  <path d="M10,56 L18,56" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" />
+  <path d="M12,64 L18,64" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
+</svg>

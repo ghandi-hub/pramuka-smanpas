@@ -37,6 +37,14 @@ const localePath = useLocalePath()
               <NuxtLink :to="localePath('/activities')" class="text-sm text-muted-foreground hover:text-primary transition-colors">
                 {{ t("footer.latestActivities") }}</NuxtLink>
             </li>
+            <li>
+              <NuxtLink :to="localePath('/sku')" class="text-sm text-muted-foreground hover:text-primary transition-colors">{{ t("footer.sku") }}
+                </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink :to="localePath('/skk')" class="text-sm text-muted-foreground hover:text-primary transition-colors">{{ t("footer.skk") }}
+                </NuxtLink>
+            </li>
           </ul>
         </div>
 

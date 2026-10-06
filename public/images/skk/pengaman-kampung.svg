@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Security Shield Backdrop -->
+  <path d="M50,14 C68,14 82,20 82,38 C82,62 50,86 50,86 C50,86 18,62 18,38 C18,20 32,14 50,14 Z" fill="#dbeafe" stroke="#1e3a8a" stroke-width="2.5" />
+  <!-- Slit Drum (Kentongan) inside -->
+  <rect x="42" y="26" width="16" height="38" rx="5" fill="#fde68a" stroke="#78350f" stroke-width="2" />
+  <!-- Kentongan Slit opening -->
+  <rect x="48" y="34" width="4" height="22" rx="2" fill="#78350f" />
+  <!-- Hanging Loop -->
+  <path d="M47,26 C47,20 53,20 53,26" stroke="#78350f" stroke-width="2" fill="none" />
+  <!-- Striker stick (Pemukul) -->
+  <line x1="62" y1="46" x2="74" y2="62" stroke="#78350f" stroke-width="3" stroke-linecap="round" />
+  <circle cx="73" cy="61" r="3.5" fill="#92400e" stroke="#78350f" stroke-width="1" />
+</svg>

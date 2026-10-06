@@ -3,6 +3,8 @@
     "home": "Home",
     "about": "About Us",
     "activities": "Activities",
+    "sku": "SKU",
+    "skk": "SKK",
     "members": "Ambalan Hierarchy",
     "contact": "Contact",
     "cta": "Login"
@@ -12,6 +14,8 @@
     "explore": "Explore",
     "aboutHistory": "Scout History",
     "latestActivities": "Latest Activities",
+    "sku": "Scout SKU",
+    "skk": "SKK & TKK",
     "organization": "Organization",
     "ambalanHierarchy": "Ambalan Hierarchy",
     "dewanAmbalan": "Ambalan Council",
@@ -142,6 +146,104 @@
     "contact": {
       "title": "Contact Us",
       "description": "Reach out or join Scouts SMAN 1 Pasawahan. We are ready to welcome you."
+    },
+    "sku": {
+      "title": "Scout SKU SMANPAS",
+      "description": "General Proficiency Requirements (SKU) for Penegak Bantara and Laksana levels at SMA Negeri 1 Pasawahan Scouts."
+    },
+    "skk": {
+      "title": "SKK & TKK Scouts SMANPAS",
+      "description": "Special Proficiency Requirements (SKK) and Special Proficiency Badges (TKK) of SMA Negeri 1 Pasawahan Scouts."
+    }
+  },
+  "sku": {
+    "header": {
+      "badge": "General Proficiency Requirements",
+      "title": "Penegak SKU",
+      "description": "General Proficiency Requirements (SKU) for the Penegak level. Complete every point to validate your skills and advance."
+    },
+    "levels": {
+      "bantara": "Penegak Bantara",
+      "laksana": "Penegak Laksana"
+    },
+    "categories": {
+      "all": "All",
+      "spiritual": "Religious/Spiritual",
+      "social": "Social & Emotional",
+      "skill": "Skills/Intellectual",
+      "physical": "Physical & Environmental"
+    },
+    "progress": {
+      "title": "Verification Progress",
+      "login_hint": "Log in to submit exams and track your verification progress."
+    },
+    "status": {
+      "not_tested": "Not Tested",
+      "pending": "Awaiting Verification",
+      "verified": "Passed / Verified",
+      "rejected": "Needs Revision"
+    },
+    "card": {
+      "submit": "Take Exam",
+      "resubmit": "Resubmit",
+      "evidence": "View evidence",
+      "examiner_notes": "Examiner Notes",
+      "login_prompt": "Log in to submit an exam"
+    },
+    "empty": "No SKU points for this filter yet.",
+    "dialog": {
+      "title": "Submit SKU Exam",
+      "notes": "Notes / Description",
+      "notes_placeholder": "Describe your readiness and evidence for this point...",
+      "evidence": "Evidence URL (optional)",
+      "cancel": "Cancel",
+      "submit": "Send Submission",
+      "sending": "Sending...",
+      "success": "Exam submission sent successfully",
+      "error": "Failed to send submission"
+    }
+  },
+  "skk": {
+    "header": {
+      "badge": "Special Proficiency Requirements",
+      "title": "SKK & Special Proficiency Badges",
+      "description": "Develop your interests and talents through Special Proficiency Requirements (SKK). Each badge has three levels: Purwa, Madya, and Utama."
+    },
+    "fields": {
+      "all": "All Fields",
+      "kuning": "Yellow — Religion & Morality",
+      "merah": "Red — Patriotism & Arts",
+      "putih": "White — Health & Agility",
+      "hijau": "Green — Skills & Development",
+      "biru": "Blue — Social & Humanitarian"
+    },
+    "levels": {
+      "purwa": "Purwa",
+      "madya": "Madya",
+      "utama": "Utama"
+    },
+    "status": {
+      "not_tested": "Not Tested",
+      "pending": "Awaiting Verification",
+      "verified": "Passed / Verified",
+      "rejected": "Needs Revision"
+    },
+    "card": {
+      "mandatory": "Mandatory Badge",
+      "evidence": "View evidence",
+      "login_prompt": "Log in to submit verification"
+    },
+    "empty": "No badges for this field yet.",
+    "dialog": {
+      "requirements": "Proficiency Requirements",
+      "notes": "Notes / Description",
+      "notes_placeholder": "Describe your experience and evidence for this requirement...",
+      "evidence": "Evidence URL (optional)",
+      "submit": "Submit Verification",
+      "sending": "Sending...",
+      "examiner_notes": "Examiner Notes",
+      "success": "Verification submission sent successfully",
+      "error": "Failed to send submission"
     }
   },
   "twibbon": {

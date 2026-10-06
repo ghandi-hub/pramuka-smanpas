@@ -2,8 +2,16 @@ import { comparePassword } from "~~/server/utils/hash";
 import { generateRandomToken } from "~~/server/utils/token";
 import { signToken } from "~~/server/utils/jwt";
 import { getDb, prepareDocumentForInsert, toMongoIdFilter } from "~~/server/utils/mongo";
+import { checkRateLimit } from "~~/server/utils/rateLimit";
 
 export default defineEventHandler(async (event) => {
+  checkRateLimit(event, {
+    key: "login",
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: "Terlalu banyak percobaan login. Silakan coba lagi dalam 15 menit.",
+  });
+
   const body = await readBody(event);
   const { email, password } = body;
 
@@ -75,7 +83,7 @@ export default defineEventHandler(async (event) => {
   const tokenDoc = prepareDocumentForInsert({
     user_id: userId,
     token: refreshToken,
-    expires_at: expiresAt.toISOString(),
+    expires_at: expiresAt,
   });
   await db.collection("refresh_tokens").insertOne(tokenDoc);
 

@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   const resetId = String(reset.id || reset._id);
 
   // 2. Validate expiration
-  if (new Date(reset.expires_at) < new Date()) {
+  if (!reset.expires_at || new Date(reset.expires_at) < new Date()) {
     await resetsCollection.deleteOne(toMongoIdFilter(resetId));
     throw createError({
       statusCode: 400,

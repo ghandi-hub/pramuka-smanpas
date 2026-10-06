@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
   const verificationDoc = prepareDocumentForInsert({
     user_id: userId,
     token: newToken,
-    expires_at: expiresAt.toISOString(),
+    expires_at: expiresAt,
   });
   await db.collection("email_verifications").insertOne(verificationDoc);
 

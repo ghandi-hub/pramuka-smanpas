@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 2. Check expiration
-  if (new Date(tokenData.expires_at) < new Date()) {
+  if (!tokenData.expires_at || new Date(tokenData.expires_at) < new Date()) {
     await tokensCollection.deleteOne({ token: refreshToken });
     throw createError({
       statusCode: 401,
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
     prepareDocumentForInsert({
       user_id: userId,
       token: newRefreshToken,
-      expires_at: newExpiresAt.toISOString(),
+      expires_at: newExpiresAt,
     }),
   );
 

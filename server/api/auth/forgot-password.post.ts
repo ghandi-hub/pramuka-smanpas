@@ -1,8 +1,16 @@
 import { sendMail } from "~~/server/utils/mailer";
 import { generateRandomToken } from "~~/server/utils/token";
 import { getDb, prepareDocumentForInsert } from "~~/server/utils/mongo";
+import { checkRateLimit } from "~~/server/utils/rateLimit";
 
 export default defineEventHandler(async (event) => {
+  checkRateLimit(event, {
+    key: "forgot-password",
+    windowMs: 15 * 60 * 1000,
+    max: 3,
+    message: "Permintaan reset password terlalu sering. Silakan coba lagi dalam 15 menit.",
+  });
+
   const body = await readBody(event);
   const { email } = body;
   const config = useRuntimeConfig();
@@ -41,7 +49,7 @@ export default defineEventHandler(async (event) => {
   const resetDoc = prepareDocumentForInsert({
     user_id: userId,
     token,
-    expires_at: expiresAt.toISOString(),
+    expires_at: expiresAt,
   });
   await db.collection("password_resets").insertOne(resetDoc);
 

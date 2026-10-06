@@ -1,26 +1,9 @@
 import { getDb, prepareDocumentForInsert } from "~~/server/utils/mongo";
 import { sendMail } from "~~/server/utils/mailer";
-
-// Simple in-memory rate limiter (per IP)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX = 3; // max 3 submissions per minute per IP
+import { checkRateLimit } from "~~/server/utils/rateLimit";
 
 // Minimum time (ms) the form should take to fill — bots submit instantly
 const MIN_FORM_TIME = 3000; // 3 seconds
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
-    return false;
-  }
-
-  entry.count++;
-  return entry.count > RATE_LIMIT_MAX;
-}
 
 function sanitize(input: string): string {
   return input
@@ -38,18 +21,12 @@ const VALID_SUBJECTS = ["join", "collab", "general"];
 
 export default defineEventHandler(async (event) => {
   // --- Rate Limiting ---
-  const forwarded = getHeader(event, "x-forwarded-for");
-  const ip =
-    forwarded?.split(",")[0]?.trim() ||
-    getHeader(event, "x-real-ip") ||
-    "unknown";
-
-  if (isRateLimited(ip)) {
-    throw createError({
-      statusCode: 429,
-      statusMessage: "Terlalu banyak permintaan. Silakan coba lagi nanti.",
-    });
-  }
+  checkRateLimit(event, {
+    key: "contact",
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: "Terlalu banyak pengiriman pesan. Silakan coba lagi dalam 15 menit.",
+  });
 
   // --- Read Body ---
   const body = await readBody(event);

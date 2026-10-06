@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 
 let client: MongoClient | null = null;
 let clientPromise: Promise<MongoClient> | null = null;
+let indexesPromise: Promise<void> | null = null;
 
 export async function getMongoClient(): Promise<MongoClient> {
   if (client) {
@@ -30,6 +31,34 @@ export async function getMongoClient(): Promise<MongoClient> {
   return clientPromise;
 }
 
+export async function ensureMongoIndexes(db?: Db): Promise<void> {
+  let targetDb = db;
+  if (!targetDb) {
+    const mongoClient = await getMongoClient();
+    const config = useRuntimeConfig();
+    const name =
+      config.mongodbDatabase ||
+      process.env.MONGODB_DATABASE ||
+      "pramuka_db";
+    targetDb = mongoClient.db(name);
+  }
+
+  await Promise.all([
+    targetDb.collection("refresh_tokens").createIndex(
+      { expires_at: 1 },
+      { expireAfterSeconds: 0 },
+    ),
+    targetDb.collection("password_resets").createIndex(
+      { expires_at: 1 },
+      { expireAfterSeconds: 0 },
+    ),
+    targetDb.collection("email_verifications").createIndex(
+      { expires_at: 1 },
+      { expireAfterSeconds: 0 },
+    ),
+  ]);
+}
+
 export async function getDb(dbName?: string): Promise<Db> {
   const mongoClient = await getMongoClient();
   const config = useRuntimeConfig();
@@ -38,7 +67,17 @@ export async function getDb(dbName?: string): Promise<Db> {
     config.mongodbDatabase ||
     process.env.MONGODB_DATABASE ||
     "pramuka_db";
-  return mongoClient.db(name);
+  const database = mongoClient.db(name);
+
+  if (!indexesPromise) {
+    indexesPromise = ensureMongoIndexes(database).catch((err) => {
+      console.error("[mongo] Failed to ensure TTL indexes:", err);
+      indexesPromise = null;
+    });
+  }
+  await indexesPromise;
+
+  return database;
 }
 
 export function transformDocument<T = any>(doc: any): T {
@@ -75,12 +114,26 @@ export function prepareDocumentForInsert<T extends Record<string, any>>(
   const generatedId = doc.id || doc._id?.toString() || randomUUID();
   const now = new Date().toISOString();
 
-  return {
+  const prepared: Record<string, any> = {
     ...doc,
     id: String(generatedId),
     _id: String(generatedId),
     created_at: doc.created_at || now,
     updated_at: doc.updated_at || now,
+  };
+
+  if (doc.expires_at !== undefined) {
+    prepared.expires_at =
+      doc.expires_at instanceof Date
+        ? doc.expires_at
+        : new Date(doc.expires_at);
+  }
+
+  return prepared as T & {
+    id: string;
+    _id: string;
+    created_at: string;
+    updated_at: string;
   };
 }
 

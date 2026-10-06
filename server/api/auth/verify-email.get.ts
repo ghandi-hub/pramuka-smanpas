@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   const verificationId = String(verification.id || verification._id);
 
   // 2. Validate expiration
-  if (new Date(verification.expires_at) < new Date()) {
+  if (!verification.expires_at || new Date(verification.expires_at) < new Date()) {
     await verificationsCollection.deleteOne(toMongoIdFilter(verificationId));
     throw createError({
       statusCode: 400,

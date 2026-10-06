@@ -159,13 +159,7 @@
       "reset": "Setel Ulang Posisi",
       "lock": "Kunci Posisi",
       "unlock": "Buka Kunci",
-      "download": "Unduh",
-      "format": "Format Ekspor",
-      "formatSquare": "Square 1:1",
-      "formatSquareDesc": "Feed / Profil (1080x1080)",
-      "formatStory": "Story 9:16",
-      "formatStoryDesc": "Instagram / WhatsApp (1080x1920)",
-      "downloading": "Memproses..."
+      "download": "Unduh"
     },
     "tips": {
       "title": "Tips:",

@@ -1,8 +1,8 @@
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, toMongoIdFilter, transformDocument } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
-  const body = await readBody(event);
+  const body = (await readBody(event)) || {};
 
   if (!id) {
     throw createError({
@@ -11,22 +11,54 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const filter = toMongoIdFilter(id);
 
-  // Update profile
-  const { data, error } = await supabase
-    .from("profiles")
-    .update(body)
-    .eq("id", id)
-    .select()
-    .single();
+  const { _id, id: bodyId, ...updateFields } = body;
+  updateFields.updated_at = new Date().toISOString();
 
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message || "Gagal memperbarui user",
+  // If email is updated, also update users table
+  if (updateFields.email) {
+    const normalizedEmail = String(updateFields.email).toLowerCase().trim();
+    updateFields.email = normalizedEmail;
+
+    // Check collision
+    const existing = await db.collection("users").findOne({
+      email: normalizedEmail,
+      id: { $ne: String(id) },
+      _id: { $ne: String(id) },
+    });
+
+    if (existing) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Email sudah digunakan oleh akun lain.",
+      });
+    }
+
+    await db.collection("users").updateOne(filter, {
+      $set: {
+        email: normalizedEmail,
+        updated_at: new Date().toISOString(),
+      },
     });
   }
 
-  return data;
+  // Update profile
+  const updatedDoc = await db
+    .collection("profiles")
+    .findOneAndUpdate(
+      filter,
+      { $set: updateFields },
+      { returnDocument: "after" },
+    );
+
+  if (!updatedDoc) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "User tidak ditemukan",
+    });
+  }
+
+  return transformDocument(updatedDoc);
 });

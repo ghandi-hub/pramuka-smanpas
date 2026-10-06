@@ -1,7 +1,7 @@
 import { comparePassword } from "~~/server/utils/hash";
 import { generateRandomToken } from "~~/server/utils/token";
 import { signToken } from "~~/server/utils/jwt";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, prepareDocumentForInsert, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -14,16 +14,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const normalizedEmail = String(email).toLowerCase().trim();
 
   // 1. Find user
-  const { data: user, error: userError } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email)
-    .single();
+  const user = await db
+    .collection("users")
+    .findOne({ email: normalizedEmail });
 
-  if (userError || !user) {
+  if (!user || !user.password_hash) {
     throw createError({
       statusCode: 401,
       statusMessage: "Email atau password salah.",
@@ -48,13 +47,12 @@ export default defineEventHandler(async (event) => {
   }
 
   // 4. Load profile role
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("name, role, avatar_url")
-    .eq("id", user.id)
-    .single();
+  const userId = String(user.id || user._id);
+  const profile = await db
+    .collection("profiles")
+    .findOne(toMongoIdFilter(userId));
 
-  if (profileError || !profile) {
+  if (!profile) {
     throw createError({
       statusCode: 500,
       statusMessage: "Gagal memuat profil pengguna.",
@@ -62,34 +60,36 @@ export default defineEventHandler(async (event) => {
   }
 
   // 5. Generate Access Token (short-lived)
-  const accessToken = signToken({
-    id: user.id,
-    role: profile.role,
-  }, '1h');
+  const accessToken = signToken(
+    {
+      id: userId,
+      role: profile.role,
+    },
+    "1h",
+  );
 
   // 6. Generate Refresh Token (long-lived)
   const refreshToken = generateRandomToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-  const { error: refreshError } = await supabase.from('refresh_tokens').insert({
-    user_id: user.id,
+  const tokenDoc = prepareDocumentForInsert({
+    user_id: userId,
     token: refreshToken,
-    expires_at: expiresAt.toISOString()
+    expires_at: expiresAt.toISOString(),
   });
+  await db.collection("refresh_tokens").insertOne(tokenDoc);
 
-  if (!refreshError) {
-    setCookie(event, 'refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      expires: expiresAt
-    });
-  }
+  setCookie(event, "refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: expiresAt,
+  });
 
   return {
     token: accessToken,
     user: {
-      id: user.id,
+      id: userId,
       name: profile.name,
       email: user.email,
       avatar_url: profile.avatar_url,

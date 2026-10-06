@@ -20,7 +20,7 @@ export function useImageService() {
   };
 
   const deleteImage = async (imageUrl: string) => {
-    if (!imageUrl || !imageUrl.includes("res.cloudinary.com")) return;
+    if (!imageUrl) return;
 
     try {
       await fetch("/api/upload", {

@@ -1,62 +1,82 @@
-import { signToken } from "~~/server/utils/jwt"
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin"
+import { signToken } from "~~/server/utils/jwt";
+import { generateRandomToken } from "~~/server/utils/token";
+import { getDb, prepareDocumentForInsert, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
-    const refreshToken = getCookie(event, 'refresh_token')
+  const refreshToken = getCookie(event, "refresh_token");
 
-    if (!refreshToken) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'Refresh token tidak ditemukan'
-        })
-    }
+  if (!refreshToken) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Refresh token tidak ditemukan",
+    });
+  }
 
-    const supabase = useSupabaseAdmin()
+  const db = await getDb();
+  const tokensCollection = db.collection("refresh_tokens");
 
-    // 1. Check token in database
-    const { data: tokenData, error: tokenError } = await supabase
-        .from('refresh_tokens')
-        .select('user_id, expires_at')
-        .eq('token', refreshToken)
-        .single()
+  // 1. Check token in database
+  const tokenData = await tokensCollection.findOne({ token: refreshToken });
 
-    if (tokenError || !tokenData) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'Refresh token tidak valid'
-        })
-    }
+  if (!tokenData) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Refresh token tidak valid",
+    });
+  }
 
-    // 2. Check expiration
-    if (new Date(tokenData.expires_at) < new Date()) {
-        await supabase.from('refresh_tokens').delete().eq('token', refreshToken)
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'Refresh token kedaluwarsa'
-        })
-    }
+  // 2. Check expiration
+  if (new Date(tokenData.expires_at) < new Date()) {
+    await tokensCollection.deleteOne({ token: refreshToken });
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Refresh token kedaluwarsa",
+    });
+  }
 
-    // 3. Get user profile for payload
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', tokenData.user_id)
-        .single()
+  // 3. Get user profile for payload
+  const userId = String(tokenData.user_id);
+  const profile = await db
+    .collection("profiles")
+    .findOne(toMongoIdFilter(userId));
 
-    if (profileError || !profile) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'User tidak ditemukan'
-        })
-    }
+  if (!profile) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "User tidak ditemukan",
+    });
+  }
 
-    // 4. Issue new access token
-    const accessToken = signToken({
-        id: tokenData.user_id,
-        role: profile.role
-    }, '1h')
+  // 4. Issue new access token
+  const accessToken = signToken(
+    {
+      id: userId,
+      role: profile.role,
+    },
+    "1h",
+  );
 
-    return {
-        token: accessToken
-    }
-})
+  // 5. Rotate refresh token: invalidate old and generate new
+  const newRefreshToken = generateRandomToken();
+  const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  await tokensCollection.deleteOne({ token: refreshToken });
+  await tokensCollection.insertOne(
+    prepareDocumentForInsert({
+      user_id: userId,
+      token: newRefreshToken,
+      expires_at: newExpiresAt.toISOString(),
+    }),
+  );
+
+  setCookie(event, "refresh_token", newRefreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: newExpiresAt,
+  });
+
+  return {
+    token: accessToken,
+  };
+});

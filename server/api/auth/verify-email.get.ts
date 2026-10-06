@@ -1,4 +1,4 @@
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -11,28 +11,26 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const verificationsCollection = db.collection("email_verifications");
 
   // 1. Find token
-  const { data: verification, error: verificationError } = await supabase
-    .from("email_verifications")
-    .select("*")
-    .eq("token", token)
-    .single();
+  const verification = await verificationsCollection.findOne({
+    token: String(token),
+  });
 
-  if (verificationError || !verification) {
+  if (!verification) {
     throw createError({
       statusCode: 400,
       statusMessage: "Token tidak valid atau sudah digunakan.",
     });
   }
 
+  const verificationId = String(verification.id || verification._id);
+
   // 2. Validate expiration
   if (new Date(verification.expires_at) < new Date()) {
-    await supabase
-      .from("email_verifications")
-      .delete()
-      .eq("id", verification.id);
+    await verificationsCollection.deleteOne(toMongoIdFilter(verificationId));
     throw createError({
       statusCode: 400,
       statusMessage: "Token sudah kedaluwarsa.",
@@ -40,12 +38,15 @@ export default defineEventHandler(async (event) => {
   }
 
   // 3. Update user
-  const { error: userError } = await supabase
-    .from("users")
-    .update({ email_verified: true })
-    .eq("id", verification.user_id);
+  const userFilter = toMongoIdFilter(String(verification.user_id));
+  const updateResult = await db.collection("users").updateOne(userFilter, {
+    $set: {
+      email_verified: true,
+      updated_at: new Date().toISOString(),
+    },
+  });
 
-  if (userError) {
+  if (updateResult.matchedCount === 0) {
     throw createError({
       statusCode: 500,
       statusMessage: "Gagal memverifikasi email.",
@@ -53,7 +54,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 4. Delete token
-  await supabase.from("email_verifications").delete().eq("id", verification.id);
+  await verificationsCollection.deleteOne(toMongoIdFilter(verificationId));
 
   return {
     message: "Email berhasil diverifikasi. Silakan login.",

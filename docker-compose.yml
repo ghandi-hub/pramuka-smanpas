@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pramuka-app:latest
+    container_name: pramuka-app
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3002}:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio}
+      - MINIO_PORT=${MINIO_PORT:-9000}
+      - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL:-https://s3.codexlab.my.id/pramuka}
+      - JWT_SECRET=${JWT_SECRET}
+      - NUXT_JWT_SECRET=${JWT_SECRET}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - mongodb_default
+      - minio_default
+
+networks:
+  mongodb_default:
+    external: true
+  minio_default:
+    external: true

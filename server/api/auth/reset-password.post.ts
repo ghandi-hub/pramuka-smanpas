@@ -1,5 +1,5 @@
 import { hashPassword } from "~~/server/utils/hash";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -12,25 +12,24 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const resetsCollection = db.collection("password_resets");
 
   // 1. Find token
-  const { data: reset, error: resetError } = await supabase
-    .from("password_resets")
-    .select("*")
-    .eq("token", token)
-    .single();
+  const reset = await resetsCollection.findOne({ token: String(token) });
 
-  if (resetError || !reset) {
+  if (!reset) {
     throw createError({
       statusCode: 400,
       statusMessage: "Token tidak valid atau sudah kedaluwarsa.",
     });
   }
 
+  const resetId = String(reset.id || reset._id);
+
   // 2. Validate expiration
   if (new Date(reset.expires_at) < new Date()) {
-    await supabase.from("password_resets").delete().eq("id", reset.id);
+    await resetsCollection.deleteOne(toMongoIdFilter(resetId));
     throw createError({
       statusCode: 400,
       statusMessage: "Token sudah kedaluwarsa.",
@@ -41,12 +40,15 @@ export default defineEventHandler(async (event) => {
   const passwordHash = await hashPassword(password);
 
   // 4. Update user
-  const { error: userError } = await supabase
-    .from("users")
-    .update({ password_hash: passwordHash })
-    .eq("id", reset.user_id);
+  const userFilter = toMongoIdFilter(String(reset.user_id));
+  const updateResult = await db.collection("users").updateOne(userFilter, {
+    $set: {
+      password_hash: passwordHash,
+      updated_at: new Date().toISOString(),
+    },
+  });
 
-  if (userError) {
+  if (updateResult.matchedCount === 0) {
     throw createError({
       statusCode: 500,
       statusMessage: "Gagal mengatur ulang password.",
@@ -54,7 +56,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 5. Delete token
-  await supabase.from("password_resets").delete().eq("id", reset.id);
+  await resetsCollection.deleteOne(toMongoIdFilter(resetId));
 
   return {
     message: "Password berhasil diatur ulang. Silakan login.",

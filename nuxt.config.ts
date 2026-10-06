@@ -7,23 +7,28 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET,
-    supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    mongodbUri: process.env.MONGODB_URI,
+    mongodbDatabase: process.env.MONGODB_DATABASE || "pramuka_db",
     emailUser: process.env.EMAIL_SMTP_USER,
     emailPassword: process.env.EMAIL_SMTP_PASS,
     emailHost: process.env.EMAIL_SMTP_HOST,
     emailPort: process.env.EMAIL_SMTP_PORT,
     emailSecure: process.env.EMAIL_SMTP_SECURE,
+    minioEndpoint: process.env.MINIO_ENDPOINT,
+    minioPort: process.env.MINIO_PORT ? parseInt(process.env.MINIO_PORT, 10) : undefined,
+    minioUseSsl: process.env.MINIO_USE_SSL === "true",
+    minioAccessKey: process.env.MINIO_ACCESS_KEY,
+    minioSecretKey: process.env.MINIO_SECRET_KEY,
+    minioBucket: process.env.MINIO_BUCKET,
+    minioPublicUrl: process.env.MINIO_PUBLIC_URL,
     public: {
       siteUrl: process.env.BASE_URL,
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
     },
   },
   vite: {
     optimizeDeps: {
       include: [
         "@panzoom/panzoom",
-        "@supabase/supabase-js",
         "@vueuse/core",
         "lucide-vue-next",
         "class-variance-authority",
@@ -36,6 +41,9 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   compatibilityDate: "2025-07-15",
+  nitro: {
+    preset: "bun",
+  },
   devtools: { enabled: true },
   css: ["~/assets/css/tailwind.css"],
   modules: ["shadcn-nuxt", "@nuxtjs/i18n", "@nuxtjs/sitemap"],

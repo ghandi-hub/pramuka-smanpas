@@ -1,30 +1,31 @@
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, prepareDocumentForInsert, transformDocument } from "~~/server/utils/mongo";
+
+const ADMIN_TABLE_WHITELIST = [
+  "activities",
+  "galleries",
+  "organization_members",
+  "contact_messages",
+  "profiles",
+  "twibbon_campaigns",
+  "abouts",
+];
 
 export default defineEventHandler(async (event) => {
   const table = getRouterParam(event, "table");
-  const body = await readBody(event);
 
-  if (!table) {
+  if (!table || !ADMIN_TABLE_WHITELIST.includes(table)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Nama tabel wajib diisi",
+      statusMessage: "Tabel tidak diizinkan atau tidak valid",
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const body = (await readBody(event)) || {};
+  const db = await getDb();
+  const collection = db.collection(table);
 
-  const { data, error } = await supabase
-    .from(table)
-    .insert(body)
-    .select()
-    .single();
+  const documentToInsert = prepareDocumentForInsert(body);
+  await collection.insertOne(documentToInsert);
 
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message,
-    });
-  }
-
-  return data;
+  return transformDocument(documentToInsert);
 });

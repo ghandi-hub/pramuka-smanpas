@@ -12,15 +12,15 @@
   "dependencies": {
     "@nuxtjs/i18n": "10.2.4",
     "@panzoom/panzoom": "^4.6.2",
-    "@supabase/supabase-js": "^2.103.3",
     "@tanstack/vue-table": "^8.21.3",
     "@vueuse/core": "^14.2.1",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
-    "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-vue-next": "^1.0.0",
+    "minio": "^8.0.7",
+    "mongodb": "^7.7.0",
     "nodemailer": "^8.0.6",
     "nuxt": "^4.4.2",
     "reka-ui": "^2.9.5",
@@ -30,7 +30,6 @@
     "vue-router": "^5.0.4",
     "vue-sonner": "^2.0.9"
   },
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "devDependencies": {
     "@nuxtjs/sitemap": "^8.0.13",
     "@nuxtjs/tailwindcss": "7.0.0-beta.1",

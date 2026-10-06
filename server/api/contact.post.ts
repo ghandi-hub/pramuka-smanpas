@@ -1,4 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { getDb, prepareDocumentForInsert } from "~~/server/utils/mongo";
+import { sendMail } from "~~/server/utils/mailer";
 
 // Simple in-memory rate limiter (per IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -129,30 +130,50 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // --- Save to Supabase ---
-  const supabase = useSupabaseAdmin();
+  // --- Save to MongoDB ---
+  const db = await getDb();
+  const contactDoc = prepareDocumentForInsert({
+    full_name: sanitize(full_name),
+    email: sanitize(email),
+    subject: sanitize(subject),
+    message: sanitize(message),
+    status: "new",
+  });
 
-  const {
-    data: insertedData,
-    status,
-    error,
-  } = await supabase
-    .from("contact_messages")
-    .insert({
-      full_name: sanitize(full_name),
-      email: sanitize(email),
-      subject: sanitize(subject),
-      message: sanitize(message),
-      status: "new",
-    })
-    .select();
-
-  if (error) {
-    console.error("[contact.post] Supabase insert error:", error);
+  try {
+    await db.collection("contact_messages").insertOne(contactDoc);
+  } catch (err: any) {
+    console.error("[contact.post] MongoDB insert error:", err);
     throw createError({
       statusCode: 500,
-      statusMessage: `Gagal mengirim pesan: ${error.message}`,
+      statusMessage: `Gagal mengirim pesan: ${err.message}`,
     });
+  }
+
+  // --- Send email notification ---
+  const config = useRuntimeConfig();
+  const targetEmail = config.emailUser;
+
+  if (targetEmail) {
+    try {
+      const emailHtml = `
+        <h2>Pesan Kontak Baru Masuk</h2>
+        <p><strong>Pengirim:</strong> ${sanitize(full_name)} (${sanitize(email)})</p>
+        <p><strong>Kategori:</strong> ${sanitize(subject)}</p>
+        <p><strong>Pesan:</strong></p>
+        <div style="background-color: #f4f4f4; padding: 12px; border-radius: 6px;">
+          ${sanitize(message).replace(/\n/g, "<br>")}
+        </div>
+      `;
+
+      await sendMail(
+        targetEmail,
+        `Pesan Kontak Baru: [${sanitize(subject)}] dari ${sanitize(full_name)}`,
+        emailHtml,
+      );
+    } catch (mailError) {
+      console.error("[contact.post] Error sending email notification:", mailError);
+    }
   }
 
   return { success: true };

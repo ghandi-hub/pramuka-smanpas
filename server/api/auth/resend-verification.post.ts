@@ -1,6 +1,6 @@
 import { sendMail } from "~~/server/utils/mailer";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
 import { generateRandomToken } from "~~/server/utils/token";
+import { getDb, prepareDocumentForInsert, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -14,33 +14,33 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
-  let userEmail = email;
-  let userId = null;
+  const db = await getDb();
+  let userEmail = email ? String(email).toLowerCase().trim() : null;
+  let userId: string | null = null;
 
-  // 1. Find user
+  // 1. Find user via old token if provided
   if (oldToken) {
-    const { data: verification } = await supabase
-      .from("email_verifications")
-      .select("user_id, users(email)")
-      .eq("token", oldToken)
-      .single();
+    const verification = await db
+      .collection("email_verifications")
+      .findOne({ token: String(oldToken) });
 
-    if (verification) {
-      userId = verification.user_id;
-      userEmail = (verification.users as any).email;
+    if (verification?.user_id) {
+      userId = String(verification.user_id);
+      const user = await db.collection("users").findOne(toMongoIdFilter(userId));
+      if (user?.email) {
+        userEmail = user.email;
+      }
     }
   }
 
-  if (!userEmail) {
-    const { data: user } = await supabase
-      .from("users")
-      .select("id, email, email_verified")
-      .eq("email", email)
-      .single();
+  // Find user via email if user not found yet
+  if (!userId && userEmail) {
+    const user = await db
+      .collection("users")
+      .findOne({ email: userEmail });
 
     if (user) {
-      userId = user.id;
+      userId = String(user.id || user._id);
       userEmail = user.email;
     }
   }
@@ -53,23 +53,24 @@ export default defineEventHandler(async (event) => {
   }
 
   // 2. Check if already verified
-  const { data: userData } = await supabase.from('users').select('email_verified').eq('id', userId).single();
+  const userData = await db.collection("users").findOne(toMongoIdFilter(userId));
   if (userData?.email_verified) {
     return { message: "Email sudah diverifikasi." };
   }
 
   // 3. Delete old tokens
-  await supabase.from("email_verifications").delete().eq("user_id", userId);
+  await db.collection("email_verifications").deleteMany({ user_id: userId });
 
   // 4. Generate new token
   const newToken = generateRandomToken();
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-  await supabase.from("email_verifications").insert({
+  const verificationDoc = prepareDocumentForInsert({
     user_id: userId,
     token: newToken,
     expires_at: expiresAt.toISOString(),
   });
+  await db.collection("email_verifications").insertOne(verificationDoc);
 
   // 5. Send email
   const verificationLink = `${config.public.siteUrl}/auth/verify-email?token=${newToken}`;

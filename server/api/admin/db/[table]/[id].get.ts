@@ -21,26 +21,17 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const body = (await readBody(event)) || {};
-  const { _id, id: bodyId, ...updateFields } = body;
-  updateFields.updated_at = new Date().toISOString();
-
   const db = await getDb();
   const collection = db.collection(table);
   const filter = toMongoIdFilter(id);
 
-  const updatedDoc = await collection.findOneAndUpdate(
-    filter,
-    { $set: updateFields },
-    { returnDocument: "after" },
-  );
-
-  if (!updatedDoc) {
+  const doc = await collection.findOne(filter);
+  if (!doc) {
     throw createError({
       statusCode: 404,
       statusMessage: "Data tidak ditemukan",
     });
   }
 
-  return transformDocument(updatedDoc);
+  return transformDocument(doc);
 });

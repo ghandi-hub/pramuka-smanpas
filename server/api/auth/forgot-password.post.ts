@@ -1,6 +1,6 @@
 import { sendMail } from "~~/server/utils/mailer";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
 import { generateRandomToken } from "~~/server/utils/token";
+import { getDb, prepareDocumentForInsert } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -14,34 +14,36 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const normalizedEmail = String(email).toLowerCase().trim();
 
   // 1. Find user
-  const { data: user, error: userError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email)
-    .single();
+  const user = await db
+    .collection("users")
+    .findOne({ email: normalizedEmail });
 
-  if (userError || !user) {
+  if (!user) {
     // Silently return success to avoid email enumeration
     return {
       message: "Jika email terdaftar, instruksi reset password telah dikirim.",
     };
   }
 
+  const userId = String(user.id || user._id);
+
   // 2. Delete old tokens
-  await supabase.from("password_resets").delete().eq("user_id", user.id);
+  await db.collection("password_resets").deleteMany({ user_id: userId });
 
   // 3. Generate reset token
   const token = generateRandomToken();
   const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
 
-  await supabase.from("password_resets").insert({
-    user_id: user.id,
+  const resetDoc = prepareDocumentForInsert({
+    user_id: userId,
     token,
     expires_at: expiresAt.toISOString(),
   });
+  await db.collection("password_resets").insertOne(resetDoc);
 
   // 4. Send email
   const resetLink = `${config.public.siteUrl}/auth/reset-password?token=${token}`;
@@ -53,7 +55,7 @@ export default defineEventHandler(async (event) => {
         <p>Tautan ini akan kedaluwarsa dalam 1 jam. Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini.</p>
     `;
 
-  await sendMail(email, "Reset Password - Pramuka SMAN 1 Pasawahan", html);
+  await sendMail(normalizedEmail, "Reset Password - Pramuka SMAN 1 Pasawahan", html);
 
   return {
     message: "Instruksi reset password telah dikirim ke email Anda.",

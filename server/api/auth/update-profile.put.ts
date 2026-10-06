@@ -1,5 +1,5 @@
 import { verifyToken } from "~~/server/utils/jwt";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, toMongoIdFilter, transformDocument } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, "Authorization");
@@ -18,9 +18,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  let decoded;
+  let decoded: any;
   try {
-    decoded = verifyToken(token) as any;
+    decoded = verifyToken(token);
   } catch (err) {
     throw createError({
       statusCode: 401,
@@ -28,19 +28,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const body = await readBody(event);
+  const body = (await readBody(event)) || {};
   const { name, email, avatar_url } = body;
-
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const currentUserId = String(decoded.id);
 
   // Check if email is being updated and if it already exists for another user
   if (email) {
-    const { data: existingUser } = await supabase
-      .from("users")
-      .select("id")
-      .eq("email", email)
-      .neq("id", decoded.id)
-      .single();
+    const normalizedEmail = String(email).toLowerCase().trim();
+    const existingUser = await db.collection("users").findOne({
+      email: normalizedEmail,
+      id: { $ne: currentUserId },
+      _id: { $ne: currentUserId },
+    });
 
     if (existingUser) {
       throw createError({
@@ -50,42 +50,37 @@ export default defineEventHandler(async (event) => {
     }
 
     // Update email in users table
-    const { error: userError } = await supabase
-      .from("users")
-      .update({ email })
-      .eq("id", decoded.id);
-
-    if (userError) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Gagal memperbarui email pengguna.",
-      });
-    }
+    await db.collection("users").updateOne(toMongoIdFilter(currentUserId), {
+      $set: {
+        email: normalizedEmail,
+        updated_at: new Date().toISOString(),
+      },
+    });
   }
 
   // Update profile
-  const updateData: any = {};
-  if (name !== undefined) updateData.name = name;
-  if (email !== undefined) updateData.email = email;
+  const updateData: Record<string, any> = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (name !== undefined) updateData.name = String(name).trim();
+  if (email !== undefined) updateData.email = String(email).toLowerCase().trim();
   if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
 
-  if (Object.keys(updateData).length > 0) {
-    const { data: updatedProfile, error: profileError } = await supabase
-      .from("profiles")
-      .update(updateData)
-      .eq("id", decoded.id)
-      .select()
-      .single();
+  const updatedProfile = await db
+    .collection("profiles")
+    .findOneAndUpdate(
+      toMongoIdFilter(currentUserId),
+      { $set: updateData },
+      { returnDocument: "after" },
+    );
 
-    if (profileError) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: profileError.message || "Gagal memperbarui profil.",
-      });
-    }
-    
-    return updatedProfile;
+  if (!updatedProfile) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Profil tidak ditemukan",
+    });
   }
 
-  return { message: "Tidak ada data yang diperbarui." };
+  return transformDocument(updatedProfile);
 });

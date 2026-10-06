@@ -12,7 +12,6 @@ import {
     Moon,
     User,
 } from 'lucide-vue-next'
-import type { SupabaseClient } from '@supabase/supabase-js'
 
 const props = defineProps<{
     open: boolean

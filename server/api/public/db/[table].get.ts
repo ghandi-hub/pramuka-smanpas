@@ -1,22 +1,29 @@
 import { getDb, transformDocument, toMongoIdFilter } from "~~/server/utils/mongo";
 
-const ADMIN_TABLE_WHITELIST = [
+const PUBLIC_TABLE_WHITELIST = [
   "activities",
   "galleries",
   "organization_members",
-  "contact_messages",
-  "profiles",
-  "twibbon_campaigns",
   "abouts",
+  "twibbon_campaigns",
 ];
+
+const FORBIDDEN_TABLES = new Set([
+  "users",
+  "profiles",
+  "contact_messages",
+  "refresh_tokens",
+  "password_resets",
+  "email_verifications",
+]);
 
 export default defineEventHandler(async (event) => {
   const table = getRouterParam(event, "table");
 
-  if (!table || !ADMIN_TABLE_WHITELIST.includes(table)) {
+  if (!table || FORBIDDEN_TABLES.has(table) || !PUBLIC_TABLE_WHITELIST.includes(table)) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Tabel tidak diizinkan atau tidak valid",
+      statusCode: 403,
+      statusMessage: "Akses ke tabel ditolak",
     });
   }
 
@@ -51,13 +58,13 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Count only requested
+  // Count requested
   if (query.count === "true") {
     const count = await collection.countDocuments(filter);
     return { count };
   }
 
-  // Order By
+  // Ordering
   let sortField = "created_at";
   if (query.orderBy) {
     const fieldCandidate = String(query.orderBy);

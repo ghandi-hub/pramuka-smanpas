@@ -1,6 +1,6 @@
 import { comparePassword, hashPassword } from "~~/server/utils/hash";
 import { verifyToken } from "~~/server/utils/jwt";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
+import { getDb, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const authHeader = getHeader(event, "Authorization");
@@ -19,9 +19,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  let decoded;
+  let decoded: any;
   try {
-    decoded = verifyToken(token) as any;
+    decoded = verifyToken(token);
   } catch (err) {
     throw createError({
       statusCode: 401,
@@ -39,16 +39,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const supabase = useSupabaseAdmin();
+  const db = await getDb();
+  const filter = toMongoIdFilter(String(decoded.id));
 
   // Get user's current password hash
-  const { data: user, error: userError } = await supabase
-    .from("users")
-    .select("password_hash")
-    .eq("id", decoded.id)
-    .single();
+  const user = await db.collection("users").findOne(filter);
 
-  if (userError || !user) {
+  if (!user || !user.password_hash) {
     throw createError({
       statusCode: 404,
       statusMessage: "User tidak ditemukan",
@@ -67,18 +64,13 @@ export default defineEventHandler(async (event) => {
   // Hash new password
   const passwordHash = await hashPassword(new_password);
 
-  // Update password
-  const { error: updateError } = await supabase
-    .from("users")
-    .update({ password_hash: passwordHash })
-    .eq("id", decoded.id);
-
-  if (updateError) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Gagal mengubah password.",
-    });
-  }
+  // Update password in users
+  await db.collection("users").updateOne(filter, {
+    $set: {
+      password_hash: passwordHash,
+      updated_at: new Date().toISOString(),
+    },
+  });
 
   return {
     message: "Password berhasil diubah.",

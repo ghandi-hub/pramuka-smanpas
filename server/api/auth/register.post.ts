@@ -1,8 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { hashPassword } from "~~/server/utils/hash";
 import { sendMail } from "~~/server/utils/mailer";
-import { useSupabaseAdmin } from "~~/server/utils/supabaseAdmin";
 import { generateRandomToken } from "~~/server/utils/token";
 import { verifyToken } from "~~/server/utils/jwt";
+import { getDb, prepareDocumentForInsert, toMongoIdFilter } from "~~/server/utils/mongo";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -16,8 +17,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Nama, email, dan password wajib diisi.",
     });
   }
-
-  const supabase = useSupabaseAdmin();
 
   // --- Authorization Check ---
   const authHeader = getHeader(event, "Authorization");
@@ -53,12 +52,13 @@ export default defineEventHandler(async (event) => {
   }
   // ---------------------------
 
+  const db = await getDb();
+  const normalizedEmail = String(email).toLowerCase().trim();
+
   // Check if user already exists
-  const { data: existingUser } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email)
-    .single();
+  const existingUser = await db
+    .collection("users")
+    .findOne({ email: normalizedEmail });
 
   if (existingUser) {
     throw createError({
@@ -72,64 +72,46 @@ export default defineEventHandler(async (event) => {
   try {
     // 2. Hash password
     const passwordHash = await hashPassword(password);
+    const userId = randomUUID();
+    createdUserId = userId;
+    const now = new Date().toISOString();
 
     // 3. Insert into users
-    const { data: user, error: userError } = await supabase
-      .from("users")
-      .insert({
-        email,
-        password_hash: passwordHash,
-      })
-      .select()
-      .single();
-
-    if (userError || !user) {
-      console.error("User creation error:", userError);
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Gagal membuat akun.",
-      });
-    }
-
-    createdUserId = user.id;
+    const userDoc = {
+      id: userId,
+      _id: userId,
+      email: normalizedEmail,
+      password_hash: passwordHash,
+      email_verified: false,
+      created_at: now,
+      updated_at: now,
+    };
+    await db.collection("users").insertOne(userDoc);
 
     // 4. Insert into profiles (using same ID)
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: user.id,
-      name,
-      email,
+    const profileDoc = {
+      id: userId,
+      _id: userId,
+      name: String(name).trim(),
+      email: normalizedEmail,
       role: role || "admin",
       avatar_url: avatar_url || null,
-    });
-
-    if (profileError) {
-      console.error("Profile creation error:", profileError);
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Gagal membuat profil.",
-      });
-    }
+      created_at: now,
+      updated_at: now,
+    };
+    await db.collection("profiles").insertOne(profileDoc);
 
     // 5. Generate verification token
     const verificationToken = generateRandomToken();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     // 6. Store token
-    const { error: tokenError } = await supabase
-      .from("email_verifications")
-      .insert({
-        user_id: user.id,
-        token: verificationToken,
-        expires_at: expiresAt.toISOString(),
-      });
-
-    if (tokenError) {
-      console.error("Token creation error:", tokenError);
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Gagal membuat token verifikasi.",
-      });
-    }
+    const verificationDoc = prepareDocumentForInsert({
+      user_id: userId,
+      token: verificationToken,
+      expires_at: expiresAt.toISOString(),
+    });
+    await db.collection("email_verifications").insertOne(verificationDoc);
 
     // 7. Send verification email
     const verificationLink = `${config.public.siteUrl}/auth/verify-email?token=${verificationToken}`;
@@ -141,18 +123,21 @@ export default defineEventHandler(async (event) => {
           <p>Tautan ini akan kedaluwarsa dalam 24 jam.</p>
       `;
 
-    await sendMail(email, "Verifikasi Email - Pramuka SMAN 1 Pasawahan", html);
+    await sendMail(normalizedEmail, "Verifikasi Email - Pramuka SMAN 1 Pasawahan", html);
 
     return {
       message: "Registrasi berhasil. Silakan cek email Anda untuk verifikasi.",
     };
   } catch (error: any) {
-    // ROLLBACK: If anything fails after user creation, delete the user
+    // ROLLBACK: If anything fails after user creation, cleanup created records
     if (createdUserId) {
-      await supabase.from("users").delete().eq("id", createdUserId);
+      await Promise.all([
+        db.collection("users").deleteOne(toMongoIdFilter(createdUserId)),
+        db.collection("profiles").deleteOne(toMongoIdFilter(createdUserId)),
+        db.collection("email_verifications").deleteMany({ user_id: createdUserId }),
+      ]);
     }
 
-    // Re-throw the error
     if (error.statusCode) throw error;
     throw createError({
       statusCode: 500,

@@ -1,6 +1,6 @@
 # Pramuka SMA Negeri 1 Pasawahan
 
-Website Landing Page and Admin CMS (Content Management System) Dashboard for the Pramuka (Scout) organization of SMA Negeri 1 Pasawahan. This project displays member profiles, activities, galleries, and announcements, while providing a comprehensive and secure admin interface to manage content using Supabase as the backend.
+Website Landing Page and Admin CMS (Content Management System) Dashboard for the Pramuka (Scout) organization of SMA Negeri 1 Pasawahan. This project displays member profiles, activities, galleries, and announcements, while providing a comprehensive and secure admin interface to manage content using MongoDB as the backend.
 
 ## Key Features
 
@@ -19,11 +19,12 @@ Website Landing Page and Admin CMS (Content Management System) Dashboard for the
 - **Framework**: Nuxt 4 (Server-Side Rendering / Static Site Generation)
 - **Frontend UI**: Tailwind CSS v4
 - **UI Components**: Shadcn UI (`shadcn-nuxt`, `reka-ui`), Lucide Vue Next
-- **Database / Auth**: Supabase (PostgreSQL, Authentication, Storage)
+- **Database**: MongoDB (`mongodb` driver)
+- **Authentication**: JWT & Refresh Tokens (Custom Secure Nitro API)
 - **Data Table**: TanStack Table (`@tanstack/vue-table`)
 - **Internationalization**: Nuxt i18n (`@nuxtjs/i18n`)
 - **State & Utilities**: VueUse (`@vueuse/core`)
-- **Deployment**: Node.js / Vercel
+- **Deployment**: Bun / Docker / Vercel
 
 ---
 
@@ -31,8 +32,7 @@ Website Landing Page and Admin CMS (Content Management System) Dashboard for the
 
 Ensure you have the following installed before setting up the project:
 
-- Node.js 18 or higher (Node.js 20+ recommended)
-- pnpm (recommended) or npm
+- Bun 1.0 or higher
 - A Supabase Project (for PostgreSQL database, Auth, and Storage)
 - (Optional) Cloudinary account for external image hosting
 
@@ -49,10 +49,10 @@ cd nuxt-app
 
 ### 2. Install Dependencies
 
-It is highly recommended to use `pnpm`:
+Install dependencies using `bun`:
 
 ```bash
-pnpm install
+bun install
 ```
 
 ### 3. Environment Setup
@@ -67,9 +67,8 @@ Add your specific configuration details (refer to the Environment Variables sect
 
 ```env
 BASE_URL=http://localhost:3000
-SUPABASE_URL=https://your-project-id.supabase.co
-SUPABASE_PUBLISHABLE_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+MONGODB_URI=mongodb://admin:password123@localhost:27017/pramuka_db?authSource=admin
+MONGODB_DATABASE=pramuka_db
 JWT_SECRET=your-jwt-secret
 ```
 
@@ -78,7 +77,7 @@ JWT_SECRET=your-jwt-secret
 Start the Nuxt dev server with hot-module replacement (HMR):
 
 ```bash
-pnpm dev
+bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -150,10 +149,9 @@ Vue Reactive State ← API Response ←
 | Variable | Description | How to Get |
 | --- | --- | --- |
 | `BASE_URL` | Application base URL | Set to `http://localhost:3000` for dev |
-| `SUPABASE_URL` | Supabase project URL | Supabase Dashboard > Project Settings > API |
-| `SUPABASE_PUBLISHABLE_KEY` | Supabase anon/public key | Supabase Dashboard > Project Settings > API |
-| `SUPABASE_SERVICE_ROLE_KEY`| Supabase service role key | Supabase Dashboard > Project Settings > API |
-| `JWT_SECRET` | Secret used to sign JWTs | Custom string or Supabase JWT secret |
+| `MONGODB_URI` | MongoDB connection URI | Example: `mongodb://admin:pass@localhost:27017/pramuka_db?authSource=admin` |
+| `MONGODB_DATABASE` | MongoDB database name | Default: `pramuka_db` |
+| `JWT_SECRET` | Secret used to sign JWTs | Random secure string (min 32 chars) |
 
 ### Optional / SMTP Configuration
 
@@ -171,11 +169,11 @@ Vue Reactive State ← API Response ←
 
 | Command | Description |
 | --- | --- |
-| `pnpm dev` | Start development server with HMR |
-| `pnpm build` | Build application for production |
-| `pnpm preview` | Locally preview the production build |
-| `pnpm generate` | Pre-render every route as a static site (SSG) |
-| `pnpm postinstall` | Run Nuxt prepare (auto-generates types) |
+| `bun run dev` | Start development server with HMR |
+| `bun run build` | Build application for production |
+| `bun run preview` | Locally preview the production build |
+| `bun run generate` | Pre-render every route as a static site (SSG) |
+| `bun run postinstall` | Run Nuxt prepare (auto-generates types) |
 
 ---
 
@@ -186,7 +184,7 @@ Currently, no formal testing suite (like Vitest or Jest) is configured for this 
 To add tests in the future, you can configure Vitest and the Nuxt test utilities:
 
 ```bash
-pnpm add -D vitest @nuxt/test-utils
+bun add -d vitest @nuxt/test-utils
 ```
 
 ### Example Test (Once Configured)
@@ -223,53 +221,52 @@ Vercel provides native, zero-configuration support for Nuxt.
 4. Add your Environment Variables in the Vercel dashboard.
 5. Click **Deploy**.
 
-### Node.js Server / Docker
+### Bun Server / Docker
 
 To deploy on a standard VPS or using Docker:
 
 1. Build the application:
 ```bash
-pnpm build
+bun run build
 ```
 
-2. The output will be in `.output/`. You can run the server via Node:
+2. The output will be in `.output/`. You can run the server via Bun:
 ```bash
-node .output/server/index.mjs
+bun .output/server/index.mjs
 ```
 
 **Docker Example (`Dockerfile`):**
 ```dockerfile
-FROM node:20-alpine
-
+FROM oven/bun:1-alpine AS builder
 WORKDIR /app
-
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install
-
-# Copy source
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
 COPY . .
+ENV NODE_ENV=production
+RUN bun run build
 
-# Build
-RUN pnpm build
-
-# Expose port
+FROM oven/bun:1-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOST=0.0.0.0
+COPY --from=builder --chown=bun:bun /app/.output ./.output
+USER bun
 EXPOSE 3000
-
-# Start the application
-CMD ["node", ".output/server/index.mjs"]
+CMD ["bun", ".output/server/index.mjs"]
 ```
 
 ---
 
 ## Troubleshooting
 
-### Supabase Connection Issues
+### MongoDB Connection Issues
 
-**Error:** `FetchError: [GET] "https://<project>.supabase.co/...": fetch failed`
+**Error:** `MongoServerSelectionError` or `MongoParseError`
 **Solution:**
-1. Verify `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env` are completely accurate without trailing slashes.
-2. Ensure your Supabase project hasn't been paused due to inactivity.
+1. Verify `MONGODB_URI` in `.env` is accurate.
+2. If username or password contains special characters (e.g. `@`, `#`, `:`, `/`), ensure they are URL-encoded (`#` -> `%23`, `@` -> `%40`).
+3. Ensure MongoDB daemon is running and reachable.
 
 ### Blank Page or Internal Server Error on Dev Server
 
@@ -278,11 +275,11 @@ Sometimes the Nuxt cache gets corrupted.
 ```bash
 # Clear Nuxt build cache and lockfiles
 rm -rf .nuxt .output
-pnpm dev
+bun run dev
 ```
 
 ### Missing Shadcn UI Component Styles
 
 **Error:** Component renders but has no styling or looks broken.
 **Solution:**
-Verify that your `tailwind.css` includes the correct Tailwind v4 directives and the Shadcn component directory is correctly specified in `nuxt.config.ts`. Run `pnpm dev` again to let Tailwind/Vite re-scan the files.
+Verify that your `tailwind.css` includes the correct Tailwind v4 directives and the Shadcn component directory is correctly specified in `nuxt.config.ts`. Run `bun run dev` again to let Tailwind/Vite re-scan the files.

@@ -1,5 +1,4 @@
 import useSupabaseCrud from "~/composables/useSupabaseCrud";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { useImageService } from "./imageService";
 
 export interface Profiles {
@@ -12,9 +11,6 @@ export interface Profiles {
 }
 
 export function useUserService() {
-  const nuxtApp = useNuxtApp();
-  const supabase = nuxtApp.$supabase as SupabaseClient;
-
   const crud = useSupabaseCrud<Profiles>("profiles");
   const { data, loading } = crud;
   const { uploadImage, deleteImage } = useImageService();
@@ -48,12 +44,12 @@ export function useUserService() {
   const fetchAll = async () => {
     loading.value = true;
     try {
-      const result = await $fetch("/api/admin/users", {
+      const result = await $fetch<Profiles[]>("/api/admin/users", {
         headers: {
           Authorization: `Bearer ${token.value}`,
         },
       });
-      data.value = result as Profiles[];
+      data.value = result;
     } catch (error) {
       console.error("Error fetching users:", error);
       throw error;
@@ -65,14 +61,14 @@ export function useUserService() {
   const update = async (id: string, profileData: Partial<Profiles>) => {
     loading.value = true;
     try {
-      const result = await $fetch(`/api/admin/users/${id}`, {
+      const result = await $fetch<Profiles>(`/api/admin/users/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token.value}`,
         },
         body: profileData,
       });
-      return result as Profiles;
+      return result;
     } catch (error) {
       console.error("Error updating user:", error);
       throw error;

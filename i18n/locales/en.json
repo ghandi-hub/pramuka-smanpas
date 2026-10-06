@@ -159,7 +159,13 @@
       "reset": "Reset Position",
       "lock": "Lock Position",
       "unlock": "Unlock Position",
-      "download": "Download"
+      "download": "Download",
+      "format": "Export Format",
+      "formatSquare": "Square 1:1",
+      "formatSquareDesc": "Feed / Profile (1080x1080)",
+      "formatStory": "Story 9:16",
+      "formatStoryDesc": "Instagram / WhatsApp (1080x1920)",
+      "downloading": "Exporting..."
     },
     "tips": {
       "title": "Tips:",

@@ -24,6 +24,8 @@ let initialPinchScale = 1;
 
 const frameSize = ref({ width: 0, height: 0 });
 const isLocked = ref(false);
+const selectedFormat = ref<'1:1' | '9:16'>('1:1');
+const isExporting = ref(false);
 
 watch(
   () => props.frameUrl,
@@ -170,83 +172,165 @@ onUnmounted(() => {
   }
 });
 
-function downloadImage() {
-  if (!userImage.value || !props.frameUrl || !imageEl.value || !container.value)
+function resetPosition() {
+  imagePosition.value = { x: 0, y: 0 };
+  imageScale.value = 1;
+}
+
+function loadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    if (!url.startsWith("blob:") && !url.startsWith("data:")) {
+      img.crossOrigin = "anonymous";
+    }
+    img.onload = () => resolve(img);
+    img.onerror = (e) => reject(e);
+    img.src = url;
+  });
+}
+
+async function downloadImage() {
+  if (!userImage.value || !props.frameUrl || !imageEl.value || !container.value || isExporting.value)
     return;
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  isExporting.value = true;
 
-  if (!ctx) return;
+  try {
+    const [frame, img] = await Promise.all([
+      loadImage(props.frameUrl),
+      loadImage(userImage.value),
+    ]);
 
-  const frame = new Image();
-  const img = new Image();
+    const format = selectedFormat.value;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
-  // Set crossOrigin to handle CORS images
-  img.crossOrigin = "anonymous";
-  frame.crossOrigin = "anonymous";
+    if (!ctx) {
+      throw new Error("Unable to initialize canvas context");
+    }
 
-  frame.onload = () => {
-    const canvasWidth = frame.width;
-    const canvasHeight = frame.height;
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    const imgW = img.naturalWidth || img.width;
+    const imgH = img.naturalHeight || img.height;
+    const imageRatio = imgW / imgH;
+    const SQUARE_SIZE = 1080;
 
-    img.onload = () => {
-      const imageRatio = img.width / img.height;
-      const canvasRatio = canvasWidth / canvasHeight;
+    let drawWidth: number;
+    let drawHeight: number;
 
-      let drawWidth: number;
-      let drawHeight: number;
+    // object-contain logic for square twibbon
+    if (imageRatio > 1) {
+      drawWidth = SQUARE_SIZE;
+      drawHeight = SQUARE_SIZE / imageRatio;
+    } else {
+      drawHeight = SQUARE_SIZE;
+      drawWidth = SQUARE_SIZE * imageRatio;
+    }
 
-      // object-contain logic
-      if (imageRatio > canvasRatio) {
-        drawWidth = canvasWidth;
-        drawHeight = canvasWidth / imageRatio;
-      } else {
-        drawHeight = canvasHeight;
-        drawWidth = canvasHeight * imageRatio;
-      }
+    // Apply user scale
+    drawWidth *= imageScale.value;
+    drawHeight *= imageScale.value;
 
-      // Apply user scale (zoom)
-      drawWidth *= imageScale.value;
-      drawHeight *= imageScale.value;
+    // Center the image in 1080x1080
+    let x = (SQUARE_SIZE - drawWidth) / 2;
+    let y = (SQUARE_SIZE - drawHeight) / 2;
 
-      // Center the image
-      let x = (canvasWidth - drawWidth) / 2;
-      let y = (canvasHeight - drawHeight) / 2;
+    // Apply user position offset
+    const renderedWidth = container.value.offsetWidth || SQUARE_SIZE;
+    const displayToCanvasScale = SQUARE_SIZE / renderedWidth;
 
-      // Apply user position offset
-      // renderedWidth is the current DOM width of the container
-      const renderedWidth = container.value!.offsetWidth;
-      const displayToCanvasScale = canvasWidth / renderedWidth;
+    x += imagePosition.value.x * displayToCanvasScale;
+    y += imagePosition.value.y * displayToCanvasScale;
 
-      x += imagePosition.value.x * displayToCanvasScale;
-      y += imagePosition.value.y * displayToCanvasScale;
+    if (format === "1:1") {
+      canvas.width = SQUARE_SIZE;
+      canvas.height = SQUARE_SIZE;
 
       ctx.drawImage(img, x, y, drawWidth, drawHeight);
-      ctx.drawImage(frame, 0, 0, canvasWidth, canvasHeight);
+      ctx.drawImage(frame, 0, 0, SQUARE_SIZE, SQUARE_SIZE);
+    } else {
+      const CANVAS_WIDTH = 1080;
+      const CANVAS_HEIGHT = 1920;
+      const Y_OFFSET = 420; // (1920 - 1080) / 2 = 420
 
-      // Download
-      const link = document.createElement("a");
-      link.download = `twibbon-${props.title}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    };
+      canvas.width = CANVAS_WIDTH;
+      canvas.height = CANVAS_HEIGHT;
 
-    img.src = userImage.value!;
-  };
+      // 1. Dark base background gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+      bgGrad.addColorStop(0, "#0b0f19");
+      bgGrad.addColorStop(0.5, "#151e2e");
+      bgGrad.addColorStop(1, "#0b0f19");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  frame.onerror = () => {
-    console.error("Failed to load frame image");
-  };
+      // 2. Blurred & dimmed user photo filling 1080x1920 (cover fit)
+      const storyRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
+      let bgW: number;
+      let bgH: number;
 
-  img.onerror = () => {
-    console.error("Failed to load user image");
-  };
+      if (imageRatio > storyRatio) {
+        bgH = CANVAS_HEIGHT + 100;
+        bgW = bgH * imageRatio;
+      } else {
+        bgW = CANVAS_WIDTH + 100;
+        bgH = bgW / imageRatio;
+      }
 
-  // Start loading by setting frame source first
-  frame.src = props.frameUrl;
+      const bgX = (CANVAS_WIDTH - bgW) / 2;
+      const bgY = (CANVAS_HEIGHT - bgH) / 2;
+
+      ctx.save();
+      if ("filter" in ctx) {
+        ctx.filter = "blur(40px) brightness(0.4) saturate(1.2)";
+      }
+      ctx.drawImage(img, bgX, bgY, bgW, bgH);
+      ctx.restore();
+
+      // 3. Dark stylish gradient overlay
+      const overlayGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+      overlayGrad.addColorStop(0, "rgba(10, 15, 26, 0.7)");
+      overlayGrad.addColorStop(0.2, "rgba(10, 15, 26, 0.4)");
+      overlayGrad.addColorStop(0.8, "rgba(10, 15, 26, 0.4)");
+      overlayGrad.addColorStop(1, "rgba(10, 15, 26, 0.7)");
+      ctx.fillStyle = overlayGrad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // 4. Subtle depth shadow behind twibbon
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+      ctx.fillRect(0, Y_OFFSET, SQUARE_SIZE, SQUARE_SIZE);
+      ctx.restore();
+
+      // 5. Draw user photo clipped to twibbon square bounds
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, Y_OFFSET, SQUARE_SIZE, SQUARE_SIZE);
+      ctx.clip();
+      ctx.drawImage(img, x, y + Y_OFFSET, drawWidth, drawHeight);
+      ctx.restore();
+
+      // 6. Draw twibbon frame centered vertically at Y_OFFSET = 420
+      ctx.drawImage(frame, 0, Y_OFFSET, SQUARE_SIZE, SQUARE_SIZE);
+    }
+
+    const formatSuffix = format === "9:16" ? "story" : "square";
+    const safeTitle = (props.title || "twibbon")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "-") || "twibbon";
+
+    const link = document.createElement("a");
+    link.download = `twibbon-${safeTitle}-${formatSuffix}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (error) {
+    console.error("Failed to generate twibbon export:", error);
+  } finally {
+    isExporting.value = false;
+  }
 }
 </script>
 
@@ -319,6 +403,71 @@ function downloadImage() {
         <div v-if="userImage"
           class="w-full flex flex-col gap-5 bg-muted/40 border border-border/50 rounded-xl p-4 sm:p-6 backdrop-blur-sm shadow-sm mt-2">
 
+          <!-- Format Selector Section -->
+          <div class="w-full space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-muted-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="text-[10px] font-bold uppercase tracking-widest">{{ $t('twibbon.controls.format') }}</span>
+              </div>
+              <span
+                class="text-xs font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                {{ selectedFormat === '1:1' ? '1080×1080' : '1080×1920' }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+              <!-- Square 1:1 -->
+              <button
+                type="button"
+                @click="selectedFormat = '1:1'"
+                :class="[
+                  'flex items-center gap-3 p-3 rounded-xl border text-left transition-all active:scale-[0.98] cursor-pointer',
+                  selectedFormat === '1:1'
+                    ? 'border-primary bg-primary/10 ring-1 ring-primary shadow-sm'
+                    : 'border-border/60 bg-background/60 hover:bg-muted text-muted-foreground'
+                ]">
+                <div
+                  class="w-9 h-9 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors"
+                  :class="selectedFormat === '1:1' ? 'border-primary bg-primary text-primary-foreground font-bold' : 'border-muted-foreground/40 bg-muted/50'">
+                  <span class="text-[11px] font-bold font-mono">1:1</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs sm:text-sm font-semibold truncate text-foreground">{{ $t('twibbon.controls.formatSquare') }}</p>
+                  <p class="text-[11px] text-muted-foreground truncate">{{ $t('twibbon.controls.formatSquareDesc') }}</p>
+                </div>
+              </button>
+
+              <!-- Story 9:16 -->
+              <button
+                type="button"
+                @click="selectedFormat = '9:16'"
+                :class="[
+                  'flex items-center gap-3 p-3 rounded-xl border text-left transition-all active:scale-[0.98] cursor-pointer',
+                  selectedFormat === '9:16'
+                    ? 'border-primary bg-primary/10 ring-1 ring-primary shadow-sm'
+                    : 'border-border/60 bg-background/60 hover:bg-muted text-muted-foreground'
+                ]">
+                <div
+                  class="w-9 h-9 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors"
+                  :class="selectedFormat === '9:16' ? 'border-primary bg-primary text-primary-foreground font-bold' : 'border-muted-foreground/40 bg-muted/50'">
+                  <span class="text-[11px] font-bold font-mono">9:16</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs sm:text-sm font-semibold truncate text-foreground">{{ $t('twibbon.controls.formatStory') }}</p>
+                  <p class="text-[11px] text-muted-foreground truncate">{{ $t('twibbon.controls.formatStoryDesc') }}</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Subtle Divider -->
+          <div class="h-px w-full bg-border/40" />
+
           <!-- Zoom Section -->
           <div class="w-full space-y-4">
             <div class="flex items-center justify-between">
@@ -343,10 +492,10 @@ function downloadImage() {
 
           <!-- Action Buttons Row -->
           <div class="flex flex-wrap items-center justify-between w-full gap-4">
-            <!-- Left Group: Zoom Tools -->
+            <!-- Left Group: Zoom & Reset Tools -->
             <div class="flex items-center gap-2">
               <button @click="imageScale = Math.max(0.1, imageScale - 0.1)"
-                class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:scale-95 transition-all bg-background border shadow-sm"
+                class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:scale-95 transition-all bg-background border shadow-sm cursor-pointer"
                 :title="$t('twibbon.controls.zoomOut')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -354,25 +503,38 @@ function downloadImage() {
                 </svg>
               </button>
               <button @click="imageScale = Math.min(5, imageScale + 0.1)"
-                class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:scale-95 transition-all bg-background border shadow-sm"
+                class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:scale-95 transition-all bg-background border shadow-sm cursor-pointer"
                 :title="$t('twibbon.controls.zoomIn')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
               </button>
+              <button @click="resetPosition"
+                class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted active:scale-95 transition-all bg-background border shadow-sm cursor-pointer"
+                :title="$t('twibbon.controls.reset')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
             </div>
 
             <!-- Right Group: Download -->
             <div class="flex items-center gap-2 flex-1 sm:flex-none justify-end">
-              <Button @click="downloadImage" size="default"
-                class="h-10 px-6 gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              <Button @click="downloadImage" :disabled="isExporting" size="default"
+                class="h-10 px-6 gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 cursor-pointer">
+                <svg v-if="isExporting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-primary-foreground" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                {{ $t('twibbon.controls.download') }}
+                <span>{{ isExporting ? $t('twibbon.controls.downloading') : $t('twibbon.controls.download') }}</span>
               </Button>
             </div>
           </div>

@@ -63,7 +63,9 @@ const categories = [
 ] as const;
 
 const activeCategory = ref<string>("all");
-const selectedReligion = ref<ReligionKey>("islam");
+const selectedReligion = computed<ReligionKey>(() =>
+  normalizeReligion(profile.value?.religion || "islam"),
+);
 
 const items = ref<SkuItem[]>([]);
 const progress = ref<any[]>([]);
@@ -112,16 +114,11 @@ const currentPoint1SubPoints = computed(() => {
   return POINT1_SUBPOINTS[lvl]?.[selectedReligion.value] || [];
 });
 
-// Hitung kelulusan Poin 1 Bantara secara menyeluruh
+// Hitung kelulusan Poin 1 Bantara sesuai agama yang dianut user
 const isPoint1BantaraVerified = computed(() => {
   if (isVerified("bantara-1")) return true;
-  for (const r of SKU_RELIGIONS) {
-    const ids = getPoint1SubPointIds("bantara", r.key);
-    if (ids.length > 0 && ids.every((id) => isVerified(id))) {
-      return true;
-    }
-  }
-  return false;
+  const ids = getPoint1SubPointIds("bantara", selectedReligion.value);
+  return ids.length > 0 && ids.every((id) => isVerified(id));
 });
 
 // Hitung sisa butir Bantara yang belum lulus
@@ -555,28 +552,26 @@ onMounted(() => {
                           </div>
                         </div>
 
-                        <!-- Selector Agama -->
+                        <!-- Keterangan Agama Berdasarkan Profil Anggota -->
                         <div class="pt-2 border-t border-border/60">
-                          <div class="flex items-center gap-2 mb-3">
-                            <span class="text-xs font-semibold text-muted-foreground">
-                              Ajaran Agama:
-                            </span>
-                            <div class="flex flex-wrap gap-1.5">
-                              <button
-                                v-for="rel in SKU_RELIGIONS"
-                                :key="rel.key"
-                                type="button"
-                                class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
-                                :class="
-                                  selectedReligion === rel.key
-                                    ? 'bg-primary text-primary-foreground shadow-sm font-semibold'
-                                    : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground'
-                                "
-                                @click="selectedReligion = rel.key"
-                              >
-                                {{ rel.label }}
-                              </button>
+                          <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                              <span class="text-xs font-semibold text-muted-foreground">
+                                Ajaran Agama:
+                              </span>
+                              <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                                {{ SKU_RELIGIONS.find((r) => r.key === selectedReligion)?.label }}
+                              </span>
+                              <span class="text-[11px] text-muted-foreground hidden sm:inline">
+                                (Butir ujian disesuaikan otomatis dengan agama yang dianut)
+                              </span>
                             </div>
+                            <NuxtLink
+                              :to="localePath('/admin/profile')"
+                              class="text-[11px] font-semibold text-primary hover:underline"
+                            >
+                              Ubah di Profil &rarr;
+                            </NuxtLink>
                           </div>
                         </div>
                       </td>

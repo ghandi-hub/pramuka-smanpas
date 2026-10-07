@@ -6,6 +6,7 @@ export interface Profiles {
   name: string;
   email: string;
   role: string;
+  religion?: string;
   avatar_url: string | null;
   created_at: string;
 }
@@ -23,6 +24,7 @@ export function useUserService() {
     password: string;
     avatar_url: string;
     role?: string;
+    religion?: string;
   }) => {
     const response = await $fetch("/api/auth/register", {
       method: "POST",
@@ -34,6 +36,7 @@ export function useUserService() {
         email: user.email,
         password: user.password,
         role: user.role,
+        religion: user.religion || "islam",
         avatar_url: user.avatar_url,
       },
     });

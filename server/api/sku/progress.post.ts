@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { requireAuthUser } from "~~/server/utils/userAuth";
-import { getDb, transformDocument } from "~~/server/utils/mongo";
+import { getDb, toMongoIdFilter, transformDocument } from "~~/server/utils/mongo";
 import {
   parseSkuSubPointId,
   getPoint1SubPointIds,
+  normalizeReligion,
   SKU_RELIGIONS,
 } from "~~/shared/skuSubpoints";
 
@@ -37,11 +38,25 @@ export default defineEventHandler(async (event) => {
   const now = new Date();
   const collection = db.collection("sku_progress");
 
+  // Ambil profil user untuk memastikan agama yang dianut
+  const userProfile = await db
+    .collection("profiles")
+    .findOne(toMongoIdFilter(user.id));
+  const userReligion = normalizeReligion(userProfile?.religion);
+
   // Cari butir SKU untuk mengetahui tingkatannya.
-  // Jika point_id berupa sub-butir (contoh: 'bantara-1_sub_0'), ambil base item ('bantara-1').
+  // Jika point_id berupa sub-butir (contoh: 'bantara-1_islam_0'), ambil base item ('bantara-1').
   const pointIdStr = String(point_id).trim();
   const parsedSub = parseSkuSubPointId(pointIdStr);
   const basePointId = parsedSub ? parsedSub.baseId : pointIdStr;
+
+  // Validasi: Member hanya boleh mengisi sub-butir sesuai agamanya
+  if (parsedSub?.religion && parsedSub.religion !== userReligion) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Anda hanya dapat mengisi butir keagamaan sesuai agama di profil Anda (${userReligion}).`,
+    });
+  }
 
   const item = await db.collection("sku_items").findOne({
     $or: [{ id: basePointId }, { _id: basePointId }],
@@ -61,7 +76,7 @@ export default defineEventHandler(async (event) => {
     const totalBantara = bantaraItems.length || 23;
 
     // Cek kelulusan Poin 1 Bantara:
-    // Lulus jika ada record 'bantara-1' verified, ATAU seluruh sub-butir salah satu agama verified.
+    // Lulus jika ada record 'bantara-1' verified, ATAU seluruh sub-butir agama user verified.
     let point1Verified = false;
     const directP1 = await collection.findOne({
       user_id: user.id,
@@ -72,25 +87,17 @@ export default defineEventHandler(async (event) => {
     if (directP1) {
       point1Verified = true;
     } else {
-      const verifiedSubs = await collection
-        .find({
-          user_id: user.id,
-          status: "verified",
-          point_id: { $regex: /^bantara-1_sub_/ },
-        })
-        .project({ point_id: 1 })
-        .toArray();
-
-      const verifiedSubSet = new Set(
-        verifiedSubs.map((d: any) => String(d.point_id)),
-      );
-
-      for (const r of SKU_RELIGIONS) {
-        const ids = getPoint1SubPointIds("bantara", r.key);
-        if (ids.length > 0 && ids.every((id) => verifiedSubSet.has(id))) {
-          point1Verified = true;
-          break;
-        }
+      const userReligionSubIds = getPoint1SubPointIds("bantara", userReligion);
+      const verifiedUserSubs = await collection.countDocuments({
+        user_id: user.id,
+        status: "verified",
+        point_id: { $in: userReligionSubIds },
+      });
+      if (
+        userReligionSubIds.length > 0 &&
+        verifiedUserSubs === userReligionSubIds.length
+      ) {
+        point1Verified = true;
       }
     }
 

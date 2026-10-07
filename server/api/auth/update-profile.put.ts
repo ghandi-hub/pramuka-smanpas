@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = (await readBody(event)) || {};
-  const { name, email, avatar_url } = body;
+  const { name, email, avatar_url, religion } = body;
   const db = await getDb();
   const currentUserId = String(decoded.id);
 
@@ -65,6 +65,7 @@ export default defineEventHandler(async (event) => {
 
   if (name !== undefined) updateData.name = String(name).trim();
   if (email !== undefined) updateData.email = String(email).toLowerCase().trim();
+  if (religion !== undefined) updateData.religion = String(religion).toLowerCase().trim();
   if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
 
   const updatedProfile = await db

@@ -29,6 +29,7 @@ const { profile, updateProfile, changePassword } = useAdminAuth();
 const profileForm = ref({
   name: "",
   email: "",
+  religion: "islam",
   avatar_url: "",
 });
 const savingProfile = ref(false);
@@ -44,6 +45,7 @@ watch(
       profileForm.value = {
         name: newVal.name || "",
         email: newVal.email || "",
+        religion: (newVal as any).religion || "islam",
         avatar_url: newVal.avatar_url || "",
       };
     }
@@ -169,6 +171,22 @@ const handlePasswordSubmit = async () => {
             <Label for="email">Alamat Email</Label>
             <Input id="email" type="email" v-model="profileForm.email" placeholder="email@example.com"
               class="bg-background" />
+          </div>
+
+          <div class="space-y-3">
+            <Label for="religion">Agama</Label>
+            <Select v-model="profileForm.religion">
+              <SelectTrigger id="religion" class="bg-background">
+                <SelectValue placeholder="Pilih agama" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="islam">Islam</SelectItem>
+                <SelectItem value="katolik">Katolik</SelectItem>
+                <SelectItem value="kristen">Kristen Protestan</SelectItem>
+                <SelectItem value="hindu">Hindu</SelectItem>
+                <SelectItem value="buddha">Buddha</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div class="space-y-3 pt-2">

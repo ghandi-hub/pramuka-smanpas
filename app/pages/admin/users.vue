@@ -44,7 +44,7 @@ const {
 } = useAdminPage<Profiles>(service as any, {
   itemName: 'User',
   imageField: 'avatar_url',
-  defaultForm: { name: '', email: '', password: '', confirm_password: '', role: 'member', avatar_url: '' }
+  defaultForm: { name: '', email: '', password: '', confirm_password: '', role: 'member', religion: 'islam', avatar_url: '' }
 })
 
 const showPassword = ref(false)
@@ -94,6 +94,18 @@ const columns: ColumnDef<Profiles, any>[] = [
       class: "max-w-[150px] lg:max-w-[250px] truncate text-muted-foreground",
       title: row.getValue("email")
     }, row.getValue("email"))
+  },
+  {
+    accessorKey: "religion",
+    header: "Agama",
+    cell: ({ row }) => {
+      const rel = (row.getValue("religion") as string) || "islam";
+      return h(
+        "span",
+        { class: "text-xs font-semibold uppercase tracking-wider text-muted-foreground" },
+        rel,
+      );
+    },
   },
   {
     accessorKey: "role",
@@ -212,6 +224,22 @@ onMounted(async () => {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div class="space-y-2">
+            <Label for="religion">Agama</Label>
+            <Select v-model="form.religion">
+              <SelectTrigger id="religion">
+                <SelectValue placeholder="Pilih agama" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="islam">Islam</SelectItem>
+                <SelectItem value="katolik">Katolik</SelectItem>
+                <SelectItem value="kristen">Kristen Protestan</SelectItem>
+                <SelectItem value="hindu">Hindu</SelectItem>
+                <SelectItem value="buddha">Buddha</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div class="space-y-2">

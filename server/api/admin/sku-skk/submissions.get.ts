@@ -109,13 +109,13 @@ async function buildSkuItemMap(db: any, itemIds: string[]) {
       normalizeSkuLevel(baseItem?.level) ??
       (parsed.baseId.startsWith("laksana") ? "laksana" : "bantara");
 
-    const sub = resolvePoint1SubPoint(level, parsed.subIndex);
-    const label = sub ? sub.label : `1.${parsed.subIndex + 1}`;
+    const sub = resolvePoint1SubPoint(level, parsed.religion, parsed.localIndex);
+    const label = sub ? sub.label : `1.${parsed.localIndex + 1}`;
     const subTitle = sub ? sub.title : "Sub-butir Keagamaan";
 
     map.set(rawId, {
       point_number: null,
-      title: `Poin ${label}: ${subTitle}`,
+      title: `Poin ${label} (${parsed.religion}): ${subTitle}`,
       level,
     });
   }

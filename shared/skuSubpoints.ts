@@ -1,5 +1,5 @@
 // Data & helper sub-butir Poin 1 (Agama/Spiritual) SKU Penegak.
-// Dipakai bersama oleh frontend (app) dan backend (server) via alias #shared.
+// Dipakai bersama oleh frontend (app) dan backend (server).
 
 export type SkuLevelKey = "bantara" | "laksana";
 
@@ -25,145 +25,111 @@ export const POINT1_SUBPOINTS: Record<
   bantara: {
     islam: [
       {
-        title: "Menjelaskan Makna Rukun Iman dan Rukun Islam",
-        description:
-          "Dapat menjelaskan makna Rukun Iman dan Rukun Islam di muka Ambalan Penegak.",
+        title: "Makna Rukun Iman dan Rukun Islam",
+        description: "Dapat menjelaskan makna Rukun Iman dan Rukun Islam.",
       },
       {
-        title: "Keutamaan dan Mendirikan Shalat Berjamaah",
+        title: "Makna Sholat Berjamaah & Sholat Sunah",
         description:
-          "Mampu menjelaskan keutamaan shalat berjamaah dan mendirikan shalat berjamaah.",
+          "Mampu menjelaskan makna Sholat berjamaah dan dapat mendirikan Sholat sunah secara individu.",
       },
       {
-        title: "Makna dan Macam-Macam Puasa",
-        description:
-          "Mampu menjelaskan makna puasa serta macam-macam puasa.",
+        title: "Makna dan Macam-macam Puasa",
+        description: "Mampu menjelaskan makna berpuasa serta macam-macam Puasa.",
       },
       {
-        title: "Zakat Fitrah dan Zakat Mal",
+        title: "Tata Cara Mengurus Jenazah (Tajhizul Jenazah)",
         description:
-          "Mengetahui waktu dan tata cara membayar zakat fitrah dan zakat mal.",
+          "Tahu tata cara merawat atau mengurus jenazah (Tajhizul Jenazah).",
       },
       {
-        title: "Tata Cara Merawat Jenazah",
-        description:
-          "Mampu menjelaskan tata cara merawat jenazah (memandikan, mengafani, menyalatkan, menguburkan).",
+        title: "Doa Ijab Qobul Zakat",
+        description: "Dapat membaca doa Ijab Qobul Zakat.",
       },
       {
-        title: "Hafalan Doa Harian dan Surat Pendek Juz 'Amma",
-        description: "Hafal minimal doa harian dan surat-surat pendek Juz 'Amma.",
+        title: "Hafalan dan Penjelasan Hadist Pilihan",
+        description:
+          "Dapat menghafal minimal sebuah hadist dan menjelaskan hadist tersebut.",
       },
     ],
     katolik: [
       {
-        title: "Makna Sakramen Baptis dan Ekaristi",
+        title: "Makna dan Arti Gereja Katolik",
+        description: "Tahu dan paham makna dan arti Gereja Katolik.",
+      },
+      {
+        title: "Memimpin Doa & Gerakan Cinta Kasih Keberagaman",
         description:
-          "Dapat menjelaskan makna Sakramen Baptis dan Ekaristi dalam iman Katolik.",
-      },
-      {
-        title: "Mengikuti Misa Mingguan",
-        description: "Rajin mengikuti misa mingguan di gereja.",
-      },
-      {
-        title: "Doa Dasar Katolik",
-        description:
-          "Mampu berdoa Bapa Kami, Salam Maria, dan Kemuliaan.",
-      },
-      {
-        title: "Sepuluh Perintah Allah dan Hukum Kasih",
-        description:
-          "Memahami Sepuluh Perintah Allah dan Hukum Kasih dalam kehidupan sehari-hari.",
-      },
-      {
-        title: "Sakramen Tobat dan Komuni",
-        description:
-          "Mengenal Sakramen Tobat dan penerimaan Komuni Kudus.",
-      },
-      {
-        title: "Hafalan Doa Harian dan Mazmur Pendek",
-        description: "Hafal doa-doa harian dan mazmur pendek.",
+          "Dapat memimpin doa dan membangun serta membuat gerakan cinta kasih pada keberagaman agama di luar Gereja Katolik.",
       },
     ],
     kristen: [
       {
-        title: "Makna Iman kepada Tuhan Yesus Kristus",
+        title: "Pendalaman dan Pengamalan Hukum Kasih",
         description:
-          "Dapat menjelaskan makna iman kepada Tuhan Yesus Kristus sebagai Juruselamat.",
-      },
-      {
-        title: "Rajin Beribadah di Gereja",
-        description: "Rajin beribadah di gereja secara teratur.",
-      },
-      {
-        title: "Hukum Kasih dan Sepuluh Hukum Taurat",
-        description:
-          "Memahami Hukum Kasih dan Sepuluh Hukum Taurat.",
-      },
-      {
-        title: "Doa Harian dan Mazmur",
-        description: "Berdoa secara teratur serta menghafal mazmur pilihan.",
-      },
-      {
-        title: "Sakramen Baptis dan Perjamuan Kudus",
-        description:
-          "Mengenal makna Sakramen Baptis dan Perjamuan Kudus.",
-      },
-      {
-        title: "Membaca Alkitab secara Teratur",
-        description: "Membiasakan membaca Alkitab secara teratur.",
+          "Mendalami Hukum Kasih dan mengamalkannya dalam kehidupan sehari-hari.",
       },
     ],
     hindu: [
       {
-        title: "Memahami Panca Sradha",
-        description: "Dapat menjelaskan Panca Sradha sebagai dasar keimanan Hindu.",
-      },
-      {
-        title: "Melaksanakan Tri Sandhya",
-        description: "Rutin melaksanakan Tri Sandhya setiap hari.",
-      },
-      {
-        title: "Memahami Tri Hita Karana",
+        title: "Sejarah Perkembangan Agama Hindu di Indonesia",
         description:
-          "Memahami Tri Hita Karana dan penerapannya dalam kehidupan.",
+          "Dapat menjelaskan sejarah perkembangan agama Hindu di Indonesia.",
       },
       {
-        title: "Mengenal Kitab Weda dan Bhagavad Gita",
-        description: "Mengenal kitab suci Weda dan Bhagavad Gita.",
+        title: "Makna & Hakikat Persembahyangan",
+        description:
+          "Dapat menjelaskan makna dan hakikat dari tujuan melaksanakan persembahyangan sehari-hari dan hari besar keagamaan Hindu.",
       },
       {
-        title: "Hari Raya Nyepi dan Galungan",
-        description: "Mengenal makna Hari Raya Nyepi dan Galungan.",
+        title: "Maksud dan Tujuan Kelahiran Manusia",
+        description:
+          "Dapat menjelaskan maksud dan tujuan kelahiran menjadi manusia menurut agama Hindu.",
       },
       {
-        title: "Hafalan Doa dan Sloka Harian",
-        description: "Hafal doa dan sloka harian.",
+        title: "Makna & Hakikat Ajaran Tri Hita Karana",
+        description:
+          "Dapat menjelaskan makna dan hakekat ajaran Tri Hita Karana dengan pelestarian alam lingkungan.",
+      },
+      {
+        title: "Gerakan Asanas dari Hatta Yoga",
+        description:
+          "Dapat mempraktikkan bentuk gerakan Asanas dari Hatta Yoga.",
+      },
+      {
+        title: "Melafalkan dan Mengkidungkan Dharma Gita",
+        description:
+          "Dapat melafalkan dan mengkidungkan salah satu bentuk Dharma Gita.",
+      },
+      {
+        title: "Struktur, Fungsi, dan Sejarah Pura Sad Kahyangan",
+        description:
+          "Dapat mendeskripsikan struktur, fungsi dan sejarah pura dalam cakupan Sad Kahyangan.",
       },
     ],
     buddha: [
       {
-        title: "Memahami Triratna",
-        description: "Dapat menjelaskan Triratna sebagai pelindung umat Buddha.",
+        title: "Saddha - Buddha Dharma Sebagai Agama",
+        description:
+          "Saddha - Mengungkapkan Buddha Dharma sebagai salah satu agama.",
       },
       {
-        title: "Memahami Empat Kesunyataan Mulia",
-        description: "Memahami Empat Kesunyataan Mulia.",
+        title: "Dasar-dasar Keyakinan & Pengembangannya",
+        description:
+          "Merumuskan dasar-dasar keyakinan dan cara mengembangkannya.",
       },
       {
-        title: "Memahami Delapan Jalan Utama",
-        description: "Memahami Delapan Jalan Utama sebagai jalan pembebasan.",
+        title: "Sejarah Buddha Gotama",
+        description: "Menjelaskan sejarah Buddha Gotama.",
       },
       {
-        title: "Melaksanakan Puja Bakti",
-        description: "Melaksanakan puja bakti secara teratur.",
+        title: "Tiratana Sebagai Pelindung",
+        description: "Menjelaskan Tiratana sebagai pelindung.",
       },
       {
-        title: "Mengenal Pancasila Buddhis",
-        description: "Mengenal dan menerapkan Pancasila Buddhis.",
-      },
-      {
-        title: "Hafalan Paritta dan Gatha Harian",
-        description: "Hafal paritta dan gatha harian.",
+        title: "Sejarah Penulisan Kitab Suci Tripitaka",
+        description:
+          "Menjelaskan kisah-kisah sejarah penulisan kitab suci tripitaka.",
       },
     ],
   },
@@ -230,22 +196,21 @@ export const POINT1_SUBPOINTS: Record<
         description: "Mampu memimpin doa bersama Tri Sandhya.",
       },
       {
-        title: "Pemangku Upacara atau Pembaca Sloka",
-        description:
-          "Mampu menjadi pemangku upacara sederhana atau pembaca sloka.",
+        title: "Pembaca Sloka atau Pemimpin Upacara",
+        description: "Mampu membaca sloka atau memimpin persembahyangan.",
       },
       {
-        title: "Dharmawacana Singkat di Ambalan",
-        description: "Memberikan dharmawacana singkat di ambalan.",
+        title: "Dharma Wacana Singkat di Ambalan",
+        description: "Memberikan dharma wacana singkat di ambalan.",
       },
       {
-        title: "Pendalaman Ajaran Agama Hindu",
-        description: "Melakukan pendalaman ajaran agama Hindu.",
+        title: "Pendalaman Materi Keagamaan",
+        description: "Pendalaman materi ajaran Hindu.",
       },
     ],
     buddha: [
       {
-        title: "Memimpin Puja Bakti Bersama",
+        title: "Memimpin Puja Bakti",
         description: "Mampu memimpin puja bakti bersama.",
       },
       {
@@ -269,60 +234,70 @@ export function normalizeSkuLevel(value: unknown): SkuLevelKey | null {
   return str === "bantara" || str === "laksana" ? str : null;
 }
 
-export function normalizeReligion(value: unknown): ReligionKey | null {
-  const str = String(value ?? "").toLowerCase();
-  return (SKU_RELIGIONS.find((r) => r.key === str)?.key as ReligionKey) ?? null;
+export function normalizeReligion(value: unknown): ReligionKey {
+  const str = String(value ?? "").toLowerCase().trim();
+  const found = SKU_RELIGIONS.find((r) => r.key === str);
+  return found ? found.key : "islam";
 }
 
 export function getPoint1SubPoints(
   level: SkuLevelKey,
   religion: ReligionKey,
 ): SkuSubPoint[] {
-  return POINT1_SUBPOINTS[level][religion] ?? [];
+  return POINT1_SUBPOINTS[level]?.[religion] ?? [];
 }
 
-export function getSubPointOffset(
-  level: SkuLevelKey,
-  religion: ReligionKey,
-): number {
-  let offset = 0;
-  for (const r of SKU_RELIGIONS) {
-    if (r.key === religion) break;
-    offset += POINT1_SUBPOINTS[level][r.key].length;
-  }
-  return offset;
-}
-
-// ID progress sub-butir: `[item_id]_sub_[subIndex]`.
-// subIndex bersifat global lintas agama agar tidak bertabrakan.
-// Islam berada di urutan pertama sehingga menghasilkan `bantara-1_sub_0`, dst.
-export function getPoint1SubPointIds(
-  level: SkuLevelKey,
-  religion: ReligionKey,
-): string[] {
-  const offset = getSubPointOffset(level, religion);
-  return POINT1_SUBPOINTS[level][religion].map(
-    (_sub, index) => `${level}-1_sub_${offset + index}`,
-  );
-}
-
+// ID progress sub-butir: `[level]-1_[religion]_[localIndex]`
 export function getPoint1SubPointId(
   level: SkuLevelKey,
   religion: ReligionKey,
   localIndex: number,
 ): string {
-  return `${level}-1_sub_${getSubPointOffset(level, religion) + localIndex}`;
+  return `${level}-1_${religion}_${localIndex}`;
+}
+
+export function getPoint1SubPointIds(
+  level: SkuLevelKey,
+  religion: ReligionKey,
+): string[] {
+  const list = POINT1_SUBPOINTS[level]?.[religion] ?? [];
+  return list.map((_, idx) => `${level}-1_${religion}_${idx}`);
 }
 
 export interface ParsedSubPointId {
   baseId: string;
-  subIndex: number;
+  level: SkuLevelKey;
+  religion: ReligionKey;
+  localIndex: number;
 }
 
 export function parseSkuSubPointId(pointId: unknown): ParsedSubPointId | null {
-  const match = /^(.+)_sub_(\d+)$/.exec(String(pointId ?? ""));
-  if (!match) return null;
-  return { baseId: match[1], subIndex: Number(match[2]) };
+  const str = String(pointId ?? "").trim();
+  // Format baru: bantara-1_islam_0
+  const matchNamed = /^(bantara|laksana)-1_(islam|katolik|kristen|hindu|buddha)_(\d+)$/.exec(str);
+  if (matchNamed && matchNamed[1] && matchNamed[2] && matchNamed[3] !== undefined) {
+    return {
+      baseId: `${matchNamed[1]}-1`,
+      level: matchNamed[1] as SkuLevelKey,
+      religion: matchNamed[2] as ReligionKey,
+      localIndex: Number(matchNamed[3]),
+    };
+  }
+
+  // Format lama legacy: bantara-1_sub_0
+  const matchOld = /^(bantara|laksana)-1_sub_(\d+)$/.exec(str);
+  if (matchOld && matchOld[1] && matchOld[2] !== undefined) {
+    const lvl = matchOld[1] as SkuLevelKey;
+    const oldIdx = Number(matchOld[2]);
+    return {
+      baseId: `${lvl}-1`,
+      level: lvl,
+      religion: "islam",
+      localIndex: oldIdx,
+    };
+  }
+
+  return null;
 }
 
 export interface ResolvedSubPoint extends SkuSubPoint {
@@ -333,23 +308,17 @@ export interface ResolvedSubPoint extends SkuSubPoint {
 
 export function resolvePoint1SubPoint(
   level: SkuLevelKey,
-  subIndex: number,
+  religion: ReligionKey,
+  localIndex: number,
 ): ResolvedSubPoint | null {
-  let offset = 0;
-  for (const r of SKU_RELIGIONS) {
-    const subs = POINT1_SUBPOINTS[level][r.key];
-    if (subIndex < offset + subs.length) {
-      const localIndex = subIndex - offset;
-      const sub = subs[localIndex];
-      return {
-        religion: r.key,
-        localIndex,
-        label: `1.${localIndex + 1}`,
-        title: sub.title,
-        description: sub.description,
-      };
-    }
-    offset += subs.length;
-  }
-  return null;
+  const subs = POINT1_SUBPOINTS[level]?.[religion];
+  if (!subs || !subs[localIndex]) return null;
+  const sub = subs[localIndex];
+  return {
+    religion,
+    localIndex,
+    label: `1.${localIndex + 1}`,
+    title: sub.title,
+    description: sub.description,
+  };
 }

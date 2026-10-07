@@ -7,7 +7,7 @@ import { getDb, prepareDocumentForInsert, toMongoIdFilter } from "~~/server/util
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { name, email, password, role, avatar_url } = body;
+  const { name, email, password, role, avatar_url, religion } = body;
   const config = useRuntimeConfig();
 
   // 1. Validate
@@ -95,11 +95,12 @@ export default defineEventHandler(async (event) => {
       name: String(name).trim(),
       email: normalizedEmail,
       role: role || "admin",
+      religion: religion || "islam",
       avatar_url: avatar_url || null,
       created_at: now,
       updated_at: now,
     };
-    await db.collection("profiles").insertOne(profileDoc);
+    await db.collection("profiles").insertOne(profileDoc as any);
 
     // 5. Generate verification token
     const verificationToken = generateRandomToken();

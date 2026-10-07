@@ -41,6 +41,7 @@ import {
   POINT1_SUBPOINTS,
   getPoint1SubPointId,
   getPoint1SubPointIds,
+  normalizeReligion,
   type ReligionKey,
   type SkuLevelKey,
 } from "~~/shared/skuSubpoints";
@@ -67,9 +68,28 @@ const selectedReligion = computed<ReligionKey>(() =>
   normalizeReligion(profile.value?.religion || "islam"),
 );
 
-const items = ref<SkuItem[]>([]);
-const progress = ref<any[]>([]);
-const loading = ref(false);
+const { data: skuData, pending: loading, refresh } = await useAsyncData(
+  () => `sku-data-${level.value}`,
+  async () => {
+    const [fetchedItems, fetchedProgress, allBantara] = await Promise.all([
+      fetchItems(level.value),
+      fetchProgress(),
+      fetchItems("bantara"),
+    ]);
+    return {
+      items: fetchedItems || [],
+      progress: fetchedProgress || [],
+      bantaraItems: allBantara || [],
+    };
+  },
+  {
+    watch: [level],
+  },
+);
+
+const items = computed<SkuItem[]>(() => skuData.value?.items ?? []);
+const progress = computed<any[]>(() => skuData.value?.progress ?? []);
+const bantaraItems = computed<SkuItem[]>(() => skuData.value?.bantaraItems ?? []);
 const submitting = ref(false);
 
 // Pagination
@@ -92,9 +112,6 @@ const activeTarget = ref<ActiveExamTarget | null>(null);
 const notes = ref("");
 const evidencePhotos = ref<string[]>([]);
 const uploading = ref(false);
-
-// Semua butir Bantara untuk menghitung prasyarat Laksana
-const bantaraItems = ref<SkuItem[]>([]);
 
 const progressMap = computed(() => {
   const map = new Map<string, any>();
@@ -233,25 +250,12 @@ const getPoint1VerifiedCount = (): { verified: number; total: number } => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const [fetchedItems, fetchedProgress, allBantara] = await Promise.all([
-      fetchItems(level.value),
-      fetchProgress(),
-      fetchItems("bantara"),
-    ]);
-    items.value = fetchedItems;
-    progress.value = fetchedProgress;
-    bantaraItems.value = allBantara;
-  } finally {
-    loading.value = false;
-  }
+  await refresh();
 };
 
 watch(level, () => {
   activeCategory.value = "all";
   currentPage.value = 1;
-  load();
 });
 
 watch(activeCategory, () => {
@@ -353,7 +357,6 @@ useSeoMeta({
 });
 
 onMounted(() => {
-  load();
   if (route.query.unauthorized) {
     import("vue-sonner").then(({ toast }) => {
       toast.error("Halaman admin hanya dapat diakses oleh akun pembina/admin.");

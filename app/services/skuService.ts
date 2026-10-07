@@ -41,15 +41,22 @@ export function useSkuService() {
     token.value ? { Authorization: `Bearer ${token.value}` } : {};
 
   const fetchItems = async (level: SkuLevel): Promise<SkuItem[]> => {
-    return await $fetch<SkuItem[]>("/api/sku/items", {
-      query: { level },
-    });
+    try {
+      return await $fetch<SkuItem[]>("/api/sku/items", {
+        query: { level },
+        timeout: 5000,
+      });
+    } catch (e) {
+      console.error("fetchItems error:", e);
+      return [];
+    }
   };
 
   const fetchProgress = async (): Promise<SkuProgress[]> => {
     try {
       return await $fetch<SkuProgress[]>("/api/sku/progress", {
         headers: authHeaders(),
+        timeout: 5000,
       });
     } catch {
       return [];

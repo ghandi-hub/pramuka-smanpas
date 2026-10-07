@@ -49,15 +49,21 @@ export function useSkkService() {
     token.value ? { Authorization: `Bearer ${token.value}` } : {};
 
   const fetchItems = async (field?: SkkColorCode | "all"): Promise<SkkItem[]> => {
-    const query: Record<string, string> = {};
-    if (field && field !== "all") query.field = field;
-    return await $fetch<SkkItem[]>("/api/skk/items", { query });
+    try {
+      const query: Record<string, string> = {};
+      if (field && field !== "all") query.field = field;
+      return await $fetch<SkkItem[]>("/api/skk/items", { query, timeout: 5000 });
+    } catch (e) {
+      console.error("fetchItems SKK error:", e);
+      return [];
+    }
   };
 
   const fetchProgress = async (): Promise<SkkProgress[]> => {
     try {
       return await $fetch<SkkProgress[]>("/api/skk/progress", {
         headers: authHeaders(),
+        timeout: 5000,
       });
     } catch {
       return [];

@@ -16,6 +16,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
   // Double check if role is admin
   if (profile.value.role !== "admin") {
-    return navigateTo("/auth/login?unauthorized=true");
+    return navigateTo("/sku?unauthorized=true");
   }
 });

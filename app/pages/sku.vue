@@ -166,7 +166,16 @@ useSeoMeta({
   description: () => t("seo.sku.description"),
 });
 
-onMounted(load);
+const route = useRoute();
+
+onMounted(() => {
+  load();
+  if (route.query.unauthorized) {
+    import("vue-sonner").then(({ toast }) => {
+      toast.error("Halaman admin hanya dapat diakses oleh akun pembina/admin.");
+    });
+  }
+});
 </script>
 
 <template>

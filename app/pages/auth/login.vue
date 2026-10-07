@@ -52,7 +52,11 @@ const handleLogin = async () => {
     }) as any;
 
     setProfile(response.user as any, response.token);
-    router.push("/admin");
+    if (response.user?.role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/sku");
+    }
   } catch (e: any) {
     if (e.statusCode === 403) {
       isUnverified.value = true;

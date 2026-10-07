@@ -5,7 +5,12 @@ import { useI18n, useLocalePath } from "#imports"
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-const { profile, loading, token, fetchProfile } = useAdminAuth()
+const { profile, loading, token, fetchProfile, clearProfile } = useAdminAuth()
+
+const handleLogout = async () => {
+  await clearProfile()
+  navigateTo(localePath('/'))
+}
 
 const isAuthChecking = computed(() => {
   // Jika sedang loading dari fetchProfile
@@ -71,16 +76,35 @@ function toggleMenu() {
         </nav>
 
         <!-- CTA & Mobile Toggle -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
           <LanguageSwitcher />
 
-          <NuxtLink :to="profile ? localePath('/admin') : localePath('/auth/login')"
-            class="hidden md:inline-flex h-10 min-w-[120px] items-center justify-center rounded-sm bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5">
-            <svg v-if="isAuthChecking" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <!-- Loading state -->
+          <div v-if="isAuthChecking" class="hidden md:inline-flex h-10 w-24 items-center justify-center">
+            <svg class="animate-spin h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span v-else>{{ profile ? 'Dashboard' : t('nav.cta') }}</span>
+          </div>
+
+          <!-- Logged in state -->
+          <template v-else-if="profile">
+            <NuxtLink :to="profile.role === 'admin' ? localePath('/admin') : localePath('/sku')"
+              class="hidden md:inline-flex h-10 items-center justify-center rounded-sm bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20">
+              <span>{{ profile.role === 'admin' ? 'Admin' : (profile.name || 'SKU Saya') }}</span>
+            </NuxtLink>
+
+            <button @click="handleLogout"
+              class="hidden md:inline-flex h-10 items-center justify-center rounded-sm border border-destructive/40 px-3 text-xs font-medium text-destructive transition-colors hover:bg-destructive hover:text-destructive-foreground"
+              title="Keluar">
+              Keluar
+            </button>
+          </template>
+
+          <!-- Guest state -->
+          <NuxtLink v-else :to="localePath('/auth/login')"
+            class="hidden md:inline-flex h-10 min-w-[120px] items-center justify-center rounded-sm bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5">
+            <span>{{ t('nav.cta') }}</span>
           </NuxtLink>
 
           <button @click="toggleMenu" class="md:hidden flex flex-col justify-center gap-1.5 w-8 h-8 rounded-full"
@@ -106,15 +130,26 @@ function toggleMenu() {
           {{ link.name }}
         </NuxtLink>
 
-        <div class="pt-8 mt-8 border-t border-border">
-          <NuxtLink :to="profile ? localePath('/admin') : localePath('/auth/login')"
+        <div class="pt-8 mt-8 border-t border-border flex flex-col gap-3">
+          <template v-if="profile">
+            <div class="flex items-center justify-between px-1 text-sm text-muted-foreground">
+              <span class="font-medium text-foreground">{{ profile.name || profile.email }}</span>
+              <span class="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">{{ profile.role }}</span>
+            </div>
+            <NuxtLink :to="profile.role === 'admin' ? localePath('/admin') : localePath('/sku')"
+              class="inline-flex h-12 w-full items-center justify-center rounded-sm bg-primary px-8 text-base font-medium text-primary-foreground"
+              @click="isMobileMenuOpen = false">
+              {{ profile.role === 'admin' ? 'Dashboard Admin' : 'Halaman SKU & SKK' }}
+            </NuxtLink>
+            <button @click="() => { isMobileMenuOpen = false; handleLogout(); }"
+              class="inline-flex h-12 w-full items-center justify-center rounded-sm border border-destructive/40 text-base font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground">
+              Keluar (Logout)
+            </button>
+          </template>
+          <NuxtLink v-else :to="localePath('/auth/login')"
             class="inline-flex h-12 w-full items-center justify-center rounded-sm bg-primary px-8 text-base font-medium text-primary-foreground"
             @click="isMobileMenuOpen = false">
-            <svg v-if="isAuthChecking" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span v-else>{{ profile ? 'Dashboard' : t('nav.cta') }}</span>
+            {{ t('nav.cta') }}
           </NuxtLink>
         </div>
       </nav>

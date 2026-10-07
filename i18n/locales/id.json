@@ -237,6 +237,10 @@
       "title": "SKK & Tanda Kecakapan Khusus",
       "description": "Kembangkan minat dan bakat melalui Syarat Kecakapan Khusus (SKK). Setiap TKK memiliki tiga tingkatan: Purwa, Madya, dan Utama."
     },
+    "progress_card": {
+      "title": "Buku Katalog & Verifikasi TKK",
+      "subtitle": "Ringkasan progres kecakapan khusus seluruh tingkatan"
+    },
     "fields": {
       "all": "Semua Bidang",
       "kuning": "Kuning — Agama & Moral",
@@ -244,6 +248,13 @@
       "putih": "Putih — Kesehatan & Ketangkasan",
       "hijau": "Hijau — Keterampilan & Pembangunan",
       "biru": "Biru — Sosial & Kemanusiaan"
+    },
+    "fields_badge": {
+      "kuning": "Kuning / Agama",
+      "merah": "Merah / Patriotisme",
+      "putih": "Putih / Ketangkasan",
+      "hijau": "Hijau / Keterampilan",
+      "biru": "Biru / Sosial"
     },
     "levels": {
       "purwa": "Purwa",
@@ -256,6 +267,23 @@
       "verified": "Lulus / Terverifikasi",
       "rejected": "Perlu Revisi"
     },
+    "status_short": {
+      "none": "Belum",
+      "locked": "Terkunci",
+      "pending": "Menunggu",
+      "verified": "Lulus",
+      "rejected": "Ditolak"
+    },
+    "table": {
+      "no": "No",
+      "tkk": "TKK",
+      "field": "Bidang",
+      "level_progress": "Pencapaian Tingkat",
+      "action": "Aksi",
+      "detail_action": "Detail & Uji",
+      "loading": "Memuat katalog TKK...",
+      "items_count": "TKK ditampilkan"
+    },
     "card": {
       "mandatory": "TKK Wajib",
       "evidence": "Lihat bukti",
@@ -264,11 +292,14 @@
     "empty": "Belum ada TKK untuk bidang ini.",
     "dialog": {
       "requirements": "Syarat Kecakapan",
+      "no_requirements": "Belum ada rincian syarat untuk tingkatan ini.",
       "notes": "Catatan / Keterangan",
       "notes_placeholder": "Jelaskan pengalaman dan bukti pemenuhan syarat ini...",
       "evidence": "Foto Bukti (wajib, maks 5)",
       "evidence_uploaded": "Foto Bukti Terunggah",
       "evidence_required": "Bukti foto wajib diunggah. Minimal 1 foto.",
+      "evidence_verified_badge": "Terverifikasi",
+      "evidence_pending_badge": "Menunggu Review",
       "submit": "Ajukan Verifikasi",
       "sending": "Mengirim...",
       "examiner_notes": "Catatan Penguji",

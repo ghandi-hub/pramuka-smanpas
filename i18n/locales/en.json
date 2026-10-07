@@ -237,6 +237,10 @@
       "title": "SKK & Special Proficiency Badges",
       "description": "Develop your interests and talents through Special Proficiency Requirements (SKK). Each badge has three levels: Purwa, Madya, and Utama."
     },
+    "progress_card": {
+      "title": "TKK Catalog & Verification Book",
+      "subtitle": "Overview of special proficiency progress across all levels"
+    },
     "fields": {
       "all": "All Fields",
       "kuning": "Yellow — Religion & Morality",
@@ -244,6 +248,13 @@
       "putih": "White — Health & Agility",
       "hijau": "Green — Skills & Development",
       "biru": "Blue — Social & Humanitarian"
+    },
+    "fields_badge": {
+      "kuning": "Yellow / Religion",
+      "merah": "Red / Patriotism",
+      "putih": "White / Agility",
+      "hijau": "Green / Skill",
+      "biru": "Blue / Social"
     },
     "levels": {
       "purwa": "Purwa",
@@ -256,6 +267,23 @@
       "verified": "Passed / Verified",
       "rejected": "Needs Revision"
     },
+    "status_short": {
+      "none": "Not Tested",
+      "locked": "Locked",
+      "pending": "Pending",
+      "verified": "Passed",
+      "rejected": "Rejected"
+    },
+    "table": {
+      "no": "No",
+      "tkk": "TKK",
+      "field": "Field",
+      "level_progress": "Level Achievement",
+      "action": "Action",
+      "detail_action": "Detail & Test",
+      "loading": "Loading TKK catalog...",
+      "items_count": "TKK displayed"
+    },
     "card": {
       "mandatory": "Mandatory Badge",
       "evidence": "View evidence",
@@ -264,11 +292,14 @@
     "empty": "No badges for this field yet.",
     "dialog": {
       "requirements": "Proficiency Requirements",
+      "no_requirements": "No requirements found for this level.",
       "notes": "Notes / Description",
       "notes_placeholder": "Describe your experience and evidence for this requirement...",
       "evidence": "Evidence Photo (required, max 5)",
       "evidence_uploaded": "Uploaded Evidence Photos",
       "evidence_required": "Evidence photo is required. Upload at least 1 photo.",
+      "evidence_verified_badge": "Verified",
+      "evidence_pending_badge": "Pending Review",
       "submit": "Submit Verification",
       "sending": "Sending...",
       "examiner_notes": "Examiner Notes",

@@ -195,12 +195,19 @@
       "title": "Submit SKU Exam",
       "notes": "Notes / Description",
       "notes_placeholder": "Describe your readiness and evidence for this point...",
-      "evidence": "Evidence URL (optional)",
+      "evidence": "Evidence Photo (required, max 5)",
+      "evidence_required": "Evidence photo is required. Upload at least 1 photo.",
       "cancel": "Cancel",
       "submit": "Send Submission",
       "sending": "Sending...",
       "success": "Exam submission sent successfully",
       "error": "Failed to send submission"
+    },
+    "lock": {
+      "title": "Laksana Level Locked",
+      "badge": "Locked",
+      "tooltip": "Complete the Bantara SKU points before submitting the Laksana level.",
+      "message": "The Laksana level cannot be tested yet. {remaining} Bantara points are still not passed. At most 2 Bantara points may remain unpassed."
     }
   },
   "skk": {
@@ -238,12 +245,19 @@
       "requirements": "Proficiency Requirements",
       "notes": "Notes / Description",
       "notes_placeholder": "Describe your experience and evidence for this requirement...",
-      "evidence": "Evidence URL (optional)",
+      "evidence": "Evidence Photo (required, max 5)",
+      "evidence_uploaded": "Uploaded Evidence Photos",
+      "evidence_required": "Evidence photo is required. Upload at least 1 photo.",
       "submit": "Submit Verification",
       "sending": "Sending...",
       "examiner_notes": "Examiner Notes",
       "success": "Verification submission sent successfully",
       "error": "Failed to send submission"
+    },
+    "lock": {
+      "title": "Level Locked",
+      "badge": "Locked",
+      "tooltip": "The {level} level is locked. The {prev} level of this badge must be passed (verified) first."
     }
   },
   "twibbon": {

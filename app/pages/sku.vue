@@ -11,6 +11,8 @@ import {
   Award,
   Loader2,
   ExternalLink,
+  Lock,
+  AlertTriangle,
 } from "lucide-vue-next";
 import Button from "~/components/ui/button/Button.vue";
 import {
@@ -21,9 +23,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
+import MultiImageUploader from "~/components/admin/MultiImageUploader.vue";
 import {
   useSkuService,
   type ProgressStatus,
@@ -57,7 +59,11 @@ const submitting = ref(false);
 const dialogOpen = ref(false);
 const activeItem = ref<SkuItem | null>(null);
 const notes = ref("");
-const evidenceUrl = ref("");
+const evidencePhotos = ref<string[]>([]);
+const uploading = ref(false);
+
+// Butir Bantara (semua) untuk hitung prasyarat Laksana.
+const bantaraItems = ref<SkuItem[]>([]);
 
 const progressMap = computed(() => {
   const map = new Map<string, any>();
@@ -70,6 +76,25 @@ const progressMap = computed(() => {
 const filteredItems = computed(() => {
   if (activeCategory.value === "all") return items.value;
   return items.value.filter((i) => i.category === activeCategory.value);
+});
+
+const isVerified = (id: unknown): boolean =>
+  progressMap.value.get(String(id))?.status === "verified";
+
+const bantaraRemaining = computed(
+  () => bantaraItems.value.filter((i) => !isVerified(i.id)).length,
+);
+
+// Laksana terkunci jika ada >= 3 butir Bantara yang belum verified.
+const laksanaLocked = computed(
+  () => level.value === "laksana" && bantaraRemaining.value >= 3,
+);
+
+const canSubmit = computed(() => {
+  if (!activeItem.value) return false;
+  if (level.value === "laksana" && laksanaLocked.value) return false;
+  if (!evidencePhotos.value.length) return false;
+  return !submitting.value && !uploading.value;
 });
 
 const verifiedCount = computed(
@@ -116,12 +141,14 @@ const statusMeta: Record<
 const load = async () => {
   loading.value = true;
   try {
-    const [fetchedItems, fetchedProgress] = await Promise.all([
+    const [fetchedItems, fetchedProgress, allBantara] = await Promise.all([
       fetchItems(level.value),
       fetchProgress(),
+      fetchItems("bantara"),
     ]);
     items.value = fetchedItems;
     progress.value = fetchedProgress;
+    bantaraItems.value = allBantara;
   } finally {
     loading.value = false;
   }
@@ -136,18 +163,33 @@ const openSubmit = (item: SkuItem) => {
   activeItem.value = item;
   const existing = progressMap.value.get(String(item.id));
   notes.value = existing?.notes ?? "";
-  evidenceUrl.value = existing?.evidence_url ?? "";
+  evidencePhotos.value = Array.isArray(existing?.evidence_photos)
+    ? existing.evidence_photos.filter((p: unknown) => typeof p === "string")
+    : existing?.evidence_url
+      ? [existing.evidence_url]
+      : [];
   dialogOpen.value = true;
 };
 
 const handleSubmit = async () => {
   if (!activeItem.value) return;
+  if (level.value === "laksana" && laksanaLocked.value) {
+    const { toast } = await import("vue-sonner");
+    toast.error(t("sku.lock.message", { remaining: bantaraRemaining.value }));
+    return;
+  }
+  if (!evidencePhotos.value.length) {
+    const { toast } = await import("vue-sonner");
+    toast.error(t("sku.dialog.evidence_required"));
+    return;
+  }
   submitting.value = true;
   try {
     await submitExam({
       point_id: String(activeItem.value.id),
       notes: notes.value,
-      evidence_url: evidenceUrl.value,
+      evidence_photos: evidencePhotos.value,
+      evidence_url: evidencePhotos.value[0],
     });
     const { toast } = await import("vue-sonner");
     toast.success(t("sku.dialog.success"));
@@ -230,6 +272,28 @@ onMounted(() => {
             :alt="t(`sku.levels.${level}`)"
             class="h-28 w-auto object-contain drop-shadow-md transition-all duration-500"
           />
+        </div>
+
+        <!-- Laksana lock warning -->
+        <div
+          v-if="laksanaLocked"
+          class="mb-8 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-700 dark:text-amber-400"
+        >
+          <AlertTriangle class="w-6 h-6 shrink-0 mt-0.5" />
+          <div>
+            <p class="font-semibold flex items-center gap-2">
+              {{ t("sku.lock.title") }}
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold uppercase tracking-wider"
+              >
+                <Lock class="w-3 h-3" />
+                {{ t("sku.lock.badge") }}
+              </span>
+            </p>
+            <p class="text-sm mt-1.5 leading-relaxed">
+              {{ t("sku.lock.message", { remaining: bantaraRemaining }) }}
+            </p>
+          </div>
         </div>
 
         <!-- Progress -->
@@ -330,13 +394,25 @@ onMounted(() => {
                       size="sm"
                       variant="outline"
                       class="rounded-full"
+                      :disabled="level === 'laksana' && laksanaLocked"
+                      :title="
+                        level === 'laksana' && laksanaLocked
+                          ? t('sku.lock.tooltip')
+                          : undefined
+                      "
                       @click="openSubmit(item)"
                     >
-                      <Send class="w-3.5 h-3.5 mr-1.5" />
+                      <Lock
+                        v-if="level === 'laksana' && laksanaLocked"
+                        class="w-3.5 h-3.5 mr-1.5"
+                      />
+                      <Send v-else class="w-3.5 h-3.5 mr-1.5" />
                       {{
-                        statusOf(item) === "none"
-                          ? t("sku.card.submit")
-                          : t("sku.card.resubmit")
+                        level === "laksana" && laksanaLocked
+                          ? t("sku.lock.badge")
+                          : statusOf(item) === "none"
+                            ? t("sku.card.submit")
+                            : t("sku.card.resubmit")
                       }}
                     </Button>
                     <a
@@ -393,12 +469,11 @@ onMounted(() => {
             />
           </div>
           <div class="space-y-2">
-            <Label for="sku-evidence">{{ t("sku.dialog.evidence") }}</Label>
-            <Input
-              id="sku-evidence"
-              v-model="evidenceUrl"
-              type="url"
-              placeholder="https://..."
+            <Label>{{ t("sku.dialog.evidence") }}</Label>
+            <MultiImageUploader
+              v-model="evidencePhotos"
+              v-model:loading="uploading"
+              :max-photos="5"
             />
           </div>
           <DialogFooter class="gap-2">
@@ -409,8 +484,15 @@ onMounted(() => {
             >
               {{ t("sku.dialog.cancel") }}
             </Button>
-            <Button type="submit" :disabled="submitting">
-              <Loader2 v-if="submitting" class="w-4 h-4 mr-2 animate-spin" />
+            <Button type="submit" :disabled="!canSubmit">
+              <Loader2
+                v-if="submitting || uploading"
+                class="w-4 h-4 mr-2 animate-spin"
+              />
+              <Lock
+                v-else-if="laksanaLocked"
+                class="w-4 h-4 mr-2"
+              />
               {{ submitting ? t("sku.dialog.sending") : t("sku.dialog.submit") }}
             </Button>
           </DialogFooter>

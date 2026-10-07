@@ -20,6 +20,7 @@ export interface Submission {
   level?: string | null;
   notes?: string | null;
   evidence_url?: string | null;
+  evidence_photos?: string[] | null;
   admin_notes?: string | null;
   submitted_at?: string | null;
   verified_at?: string | null;

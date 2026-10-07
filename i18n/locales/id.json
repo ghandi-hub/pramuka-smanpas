@@ -195,12 +195,19 @@
       "title": "Ajukan Ujian SKU",
       "notes": "Catatan / Keterangan",
       "notes_placeholder": "Jelaskan kesiapan dan bukti pemenuhan butir ini...",
-      "evidence": "URL Bukti (opsional)",
+      "evidence": "Foto Bukti (wajib, maks 5)",
+      "evidence_required": "Bukti foto wajib diunggah. Minimal 1 foto.",
       "cancel": "Batal",
       "submit": "Kirim Pengajuan",
       "sending": "Mengirim...",
       "success": "Pengajuan ujian berhasil dikirim",
       "error": "Gagal mengirim pengajuan"
+    },
+    "lock": {
+      "title": "Tingkat Laksana Terkunci",
+      "badge": "Terkunci",
+      "tooltip": "Selesaikan butir SKU Bantara terlebih dahulu sebelum mengajukan tingkat Laksana.",
+      "message": "Tingkat Laksana belum dapat diuji. Masih ada {remaining} butir Bantara yang belum lulus. Maksimal 2 butir Bantara boleh belum lulus."
     }
   },
   "skk": {
@@ -238,12 +245,19 @@
       "requirements": "Syarat Kecakapan",
       "notes": "Catatan / Keterangan",
       "notes_placeholder": "Jelaskan pengalaman dan bukti pemenuhan syarat ini...",
-      "evidence": "URL Bukti (opsional)",
+      "evidence": "Foto Bukti (wajib, maks 5)",
+      "evidence_uploaded": "Foto Bukti Terunggah",
+      "evidence_required": "Bukti foto wajib diunggah. Minimal 1 foto.",
       "submit": "Ajukan Verifikasi",
       "sending": "Mengirim...",
       "examiner_notes": "Catatan Penguji",
       "success": "Pengajuan verifikasi berhasil dikirim",
       "error": "Gagal mengirim pengajuan"
+    },
+    "lock": {
+      "title": "Tingkat Terkunci",
+      "badge": "Terkunci",
+      "tooltip": "Tingkat {level} terkunci. Tingkat {prev} pada butir SKK ini harus lulus (verified) terlebih dahulu."
     }
   },
   "twibbon": {

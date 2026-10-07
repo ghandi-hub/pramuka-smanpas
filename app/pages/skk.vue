@@ -11,6 +11,7 @@ import {
   Loader2,
   ExternalLink,
   Star,
+  Lock,
 } from "lucide-vue-next";
 import Button from "~/components/ui/button/Button.vue";
 import {
@@ -21,9 +22,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
+import MultiImageUploader from "~/components/admin/MultiImageUploader.vue";
 import {
   useSkkService,
   type ProgressStatus,
@@ -57,9 +58,11 @@ const dialogOpen = ref(false);
 const activeItem = ref<SkkItem | null>(null);
 const activeLevel = ref<SkkLevel>("purwa");
 const notes = ref("");
-const evidenceUrl = ref("");
+const evidencePhotos = ref<string[]>([]);
+const uploading = ref(false);
 
 const skkLevels: SkkLevel[] = ["purwa", "madya", "utama"];
+const levelIndex: Record<SkkLevel, number> = { purwa: 0, madya: 1, utama: 2 };
 
 const progressMap = computed(() => {
   const map = new Map<string, any>();
@@ -77,6 +80,34 @@ const filteredItems = computed(() => {
 const statusOf = (skkId: string, level: SkkLevel): ProgressStatus | "none" => {
   return progressMap.value.get(`${skkId}:${level}`)?.status ?? "none";
 };
+
+const previousLevel = (level: SkkLevel): SkkLevel | null => {
+  const idx = levelIndex[level];
+  return idx > 0 ? skkLevels[idx - 1] : null;
+};
+
+// Tingkat terkunci jika tingkat sebelumnya (skk_id sama) belum verified.
+const isLevelLocked = (skkId: string, level: SkkLevel): boolean => {
+  const prev = previousLevel(level);
+  if (!prev) return false;
+  return statusOf(skkId, prev) !== "verified";
+};
+
+const lockReason = (skkId: string, level: SkkLevel): string => {
+  const prev = previousLevel(level);
+  if (!prev) return "";
+  return t("skk.lock.tooltip", {
+    level: t(`skk.levels.${level}`),
+    prev: t(`skk.levels.${prev}`),
+  });
+};
+
+const canSubmit = computed(() => {
+  if (!activeItem.value) return false;
+  if (isLevelLocked(activeItem.value.id, activeLevel.value)) return false;
+  if (!evidencePhotos.value.length) return false;
+  return !submitting.value && !uploading.value;
+});
 
 const overallStatus = (skkId: string): ProgressStatus | "none" => {
   const statuses = skkLevels.map((l) => statusOf(skkId, l));
@@ -142,7 +173,7 @@ const openDetail = (item: SkkItem) => {
   activeItem.value = item;
   activeLevel.value = "purwa";
   notes.value = "";
-  evidenceUrl.value = "";
+  evidencePhotos.value = [];
   dialogOpen.value = true;
 };
 
@@ -150,18 +181,33 @@ const selectLevel = (lvl: SkkLevel) => {
   activeLevel.value = lvl;
   const existing = progressMap.value.get(`${activeItem.value?.id}:${lvl}`);
   notes.value = existing?.notes ?? "";
-  evidenceUrl.value = existing?.evidence_url ?? "";
+  evidencePhotos.value = Array.isArray(existing?.evidence_photos)
+    ? existing.evidence_photos.filter((p: unknown) => typeof p === "string")
+    : existing?.evidence_url
+      ? [existing.evidence_url]
+      : [];
 };
 
 const handleSubmit = async () => {
   if (!activeItem.value) return;
+  if (isLevelLocked(activeItem.value.id, activeLevel.value)) {
+    const { toast } = await import("vue-sonner");
+    toast.error(lockReason(activeItem.value.id, activeLevel.value));
+    return;
+  }
+  if (!evidencePhotos.value.length) {
+    const { toast } = await import("vue-sonner");
+    toast.error(t("sku.dialog.evidence_required"));
+    return;
+  }
   submitting.value = true;
   try {
     await submitVerification({
       skk_id: String(activeItem.value.id),
       level: activeLevel.value,
       notes: notes.value,
-      evidence_url: evidenceUrl.value,
+      evidence_photos: evidencePhotos.value,
+      evidence_url: evidencePhotos.value[0],
     });
     const { toast } = await import("vue-sonner");
     toast.success(t("skk.dialog.success"));
@@ -373,7 +419,7 @@ onMounted(load);
           <button
             v-for="lvl in skkLevels"
             :key="lvl"
-            class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all capitalize"
+            class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all capitalize"
             :class="
               activeLevel === lvl
                 ? 'bg-background text-foreground shadow-sm'
@@ -381,6 +427,10 @@ onMounted(load);
             "
             @click="selectLevel(lvl)"
           >
+            <Lock
+              v-if="activeItem && isLevelLocked(activeItem.id, lvl)"
+              class="w-3 h-3 text-amber-500"
+            />
             {{ t(`skk.levels.${lvl}`) }}
           </button>
         </div>
@@ -434,6 +484,19 @@ onMounted(load);
           class="space-y-4 pt-2 border-t border-border"
           @submit.prevent="handleSubmit"
         >
+          <div
+            v-if="activeItem && isLevelLocked(activeItem.id, activeLevel)"
+            class="mt-4 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400"
+          >
+            <Lock class="w-5 h-5 shrink-0 mt-0.5" />
+            <div>
+              <p class="font-semibold">{{ t("skk.lock.title") }}</p>
+              <p class="text-xs mt-1 leading-relaxed">
+                {{ lockReason(activeItem.id, activeLevel) }}
+              </p>
+            </div>
+          </div>
+
           <div class="space-y-2 pt-4">
             <Label for="skk-notes">{{ t("skk.dialog.notes") }}</Label>
             <Textarea
@@ -444,39 +507,63 @@ onMounted(load);
             />
           </div>
           <div class="space-y-2">
-            <Label for="skk-evidence">{{ t("skk.dialog.evidence") }}</Label>
-            <Input
-              id="skk-evidence"
-              v-model="evidenceUrl"
-              type="url"
-              placeholder="https://..."
+            <Label>{{ t("skk.dialog.evidence") }}</Label>
+            <MultiImageUploader
+              v-model="evidencePhotos"
+              v-model:loading="uploading"
+              :max-photos="5"
             />
           </div>
           <div class="flex flex-wrap items-center gap-3">
-            <Button type="submit" :disabled="submitting">
-              <Loader2 v-if="submitting" class="w-4 h-4 mr-2 animate-spin" />
+            <Button type="submit" :disabled="!canSubmit">
+              <Loader2
+                v-if="submitting || uploading"
+                class="w-4 h-4 mr-2 animate-spin"
+              />
+              <Lock
+                v-else-if="activeItem && isLevelLocked(activeItem.id, activeLevel)"
+                class="w-4 h-4 mr-2"
+              />
               <Send v-else class="w-4 h-4 mr-2" />
-              {{
-                submitting
-                  ? t("skk.dialog.sending")
-                  : t("skk.dialog.submit")
-              }}
+              {{ submitting ? t("skk.dialog.sending") : t("skk.dialog.submit") }}
             </Button>
-            <a
-              v-if="
-                activeItem &&
-                progressMap.get(`${activeItem.id}:${activeLevel}`)?.evidence_url
-              "
-              :href="
-                progressMap.get(`${activeItem.id}:${activeLevel}`).evidence_url
-              "
-              target="_blank"
-              rel="noopener"
-              class="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            <span
+              v-if="activeItem && isLevelLocked(activeItem.id, activeLevel)"
+              class="inline-flex items-center gap-1 text-xs font-semibold text-amber-600"
             >
-              <ExternalLink class="w-3 h-3" />
-              {{ t("skk.card.evidence") }}
-            </a>
+              <Lock class="w-3 h-3" />
+              {{ t("skk.lock.badge") }}
+            </span>
+          </div>
+
+          <!-- Evidence gallery -->
+          <div
+            v-if="progressMap.get(`${activeItem?.id}:${activeLevel}`)?.evidence_photos?.length"
+            class="space-y-2 pt-2"
+          >
+            <Label>{{ t("skk.dialog.evidence_uploaded") }}</Label>
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <a
+                v-for="url in progressMap.get(`${activeItem?.id}:${activeLevel}`)
+                  .evidence_photos"
+                :key="url"
+                :href="url"
+                target="_blank"
+                rel="noopener"
+                class="relative aspect-square rounded-lg overflow-hidden border border-border bg-muted group"
+              >
+                <img
+                  :src="url"
+                  class="w-full h-full object-cover"
+                  alt="Bukti foto"
+                />
+                <span
+                  class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
+                >
+                  <ExternalLink class="w-4 h-4" />
+                </span>
+              </a>
+            </div>
           </div>
         </form>
 

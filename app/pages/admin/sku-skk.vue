@@ -10,6 +10,10 @@ import {
   ExternalLink,
   ShieldCheck,
   ClipboardList,
+  Images,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-vue-next";
 import Button from "~/components/ui/button/Button.vue";
 import DataTable from "~/components/admin/DataTable.vue";
@@ -48,6 +52,36 @@ const saving = ref(false);
 const activeSubmission = ref<Submission | null>(null);
 const decision = ref<"verified" | "rejected">("verified");
 const adminNotes = ref("");
+
+// Galeri bukti + modal zoom.
+const galleryOpen = ref(false);
+const galleryPhotos = ref<string[]>([]);
+const galleryIndex = ref(0);
+
+const openGallery = (s: Submission) => {
+  const photos =
+    s.evidence_photos && s.evidence_photos.length
+      ? s.evidence_photos
+      : s.evidence_url
+        ? [s.evidence_url]
+        : [];
+  if (!photos.length) return;
+  galleryPhotos.value = photos;
+  galleryIndex.value = 0;
+  galleryOpen.value = true;
+};
+
+const nextPhoto = () => {
+  if (!galleryPhotos.value.length) return;
+  galleryIndex.value = (galleryIndex.value + 1) % galleryPhotos.value.length;
+};
+
+const prevPhoto = () => {
+  if (!galleryPhotos.value.length) return;
+  galleryIndex.value =
+    (galleryIndex.value - 1 + galleryPhotos.value.length) %
+    galleryPhotos.value.length;
+};
 
 const typeOptions: { value: SubmissionType; label: string }[] = [
   { value: "all", label: "Semua" },
@@ -218,6 +252,72 @@ const columns: ColumnDef<Submission, any>[] = [
       ),
   },
   {
+    id: "evidence",
+    header: "Bukti Foto",
+    cell: ({ row }) => {
+      const s = row.original;
+      const photos =
+        s.evidence_photos && s.evidence_photos.length
+          ? s.evidence_photos
+          : s.evidence_url
+            ? [s.evidence_url]
+            : [];
+      if (!photos.length) {
+        return h(
+          "span",
+          { class: "text-xs text-muted-foreground" },
+          "Tidak ada",
+        );
+      }
+      return h(
+        "div",
+        { class: "flex items-center gap-2" },
+        [
+          h(
+            "button",
+            {
+              type: "button",
+              class:
+                "relative h-10 w-10 rounded-lg overflow-hidden border border-border shrink-0",
+              title: "Lihat galeri bukti",
+              onClick: () => openGallery(s),
+            },
+            [
+              h("img", {
+                src: photos[0],
+                class: "h-full w-full object-cover",
+              }),
+              photos.length > 1
+                ? h(
+                    "span",
+                    {
+                      class:
+                        "absolute bottom-0 right-0 bg-black/70 text-white text-[9px] font-bold px-1 rounded-tl",
+                    },
+                    `+${photos.length - 1}`,
+                  )
+                : null,
+            ],
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              class:
+                "inline-flex items-center gap-1 text-xs text-primary hover:underline",
+              title: "Buka galeri",
+              onClick: () => openGallery(s),
+            },
+            [
+              h(Images, { class: "w-3.5 h-3.5" }),
+              `${photos.length} foto`,
+            ],
+          ),
+        ],
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -255,19 +355,21 @@ const columns: ColumnDef<Submission, any>[] = [
     cell: ({ row }) => {
       const s = row.original;
       const buttons: any[] = [];
-      if (s.evidence_url) {
+      if (
+        (s.evidence_photos && s.evidence_photos.length) ||
+        s.evidence_url
+      ) {
         buttons.push(
           h(
-            "a",
+            Button,
             {
-              href: s.evidence_url,
-              target: "_blank",
-              rel: "noopener",
-              class:
-                "inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground",
+              variant: "ghost",
+              size: "icon",
+              class: "h-8 w-8 text-muted-foreground",
               title: "Lihat bukti",
+              onClick: () => openGallery(s),
             },
-            [h(ExternalLink, { class: "w-4 h-4" })],
+            () => h(ExternalLink, { class: "w-4 h-4" }),
           ),
         );
       }
@@ -431,6 +533,41 @@ onMounted(load);
           />
         </div>
 
+        <!-- Galeri bukti -->
+        <div
+          v-if="
+            (activeSubmission?.evidence_photos?.length ?? 0) ||
+            activeSubmission?.evidence_url
+          "
+          class="space-y-2"
+        >
+          <Label>Bukti Foto</Label>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <button
+              v-for="(url, idx) in activeSubmission?.evidence_photos?.length
+                ? activeSubmission.evidence_photos
+                : [activeSubmission?.evidence_url]"
+              :key="url"
+              type="button"
+              class="relative aspect-square rounded-lg overflow-hidden border border-border bg-muted group"
+              @click="
+                galleryPhotos = activeSubmission?.evidence_photos?.length
+                  ? activeSubmission.evidence_photos
+                  : [activeSubmission?.evidence_url!];
+                galleryIndex = idx;
+                galleryOpen = true;
+              "
+            >
+              <img :src="url!" class="w-full h-full object-cover" alt="Bukti" />
+              <span
+                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
+              >
+                <ExternalLink class="w-4 h-4" />
+              </span>
+            </button>
+          </div>
+        </div>
+
         <DialogFooter class="gap-2">
           <Button type="button" variant="outline" @click="dialogOpen = false">
             Batal
@@ -457,6 +594,76 @@ onMounted(load);
             {{ saving ? "Menyimpan..." : "Tolak" }}
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <!-- Zoom modal galeri bukti -->
+    <Dialog v-model:open="galleryOpen">
+      <DialogContent
+        class="sm:max-w-3xl p-0 overflow-hidden bg-background"
+        :show-close-button="false"
+      >
+        <div class="relative">
+          <button
+            type="button"
+            class="absolute top-3 right-3 z-10 h-9 w-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+            title="Tutup"
+            @click="galleryOpen = false"
+          >
+            <X class="w-5 h-5" />
+          </button>
+
+          <div class="flex items-center justify-center bg-black/90 min-h-[50vh]">
+            <img
+              v-if="galleryPhotos[galleryIndex]"
+              :src="galleryPhotos[galleryIndex]"
+              class="max-h-[80vh] max-w-full object-contain"
+              alt="Bukti foto"
+            />
+          </div>
+
+          <template v-if="galleryPhotos.length > 1">
+            <button
+              type="button"
+              class="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+              title="Sebelumnya"
+              @click="prevPhoto"
+            >
+              <ChevronLeft class="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+              title="Berikutnya"
+              @click="nextPhoto"
+            >
+              <ChevronRight class="w-5 h-5" />
+            </button>
+            <div
+              class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 text-white text-xs font-semibold"
+            >
+              {{ galleryIndex + 1 }} / {{ galleryPhotos.length }}
+            </div>
+          </template>
+
+          <div
+            v-if="galleryPhotos.length > 1"
+            class="flex gap-2 p-3 overflow-x-auto"
+          >
+            <button
+              v-for="(url, idx) in galleryPhotos"
+              :key="url"
+              type="button"
+              class="h-14 w-14 rounded-lg overflow-hidden border-2 shrink-0 transition-colors"
+              :class="
+                idx === galleryIndex ? 'border-primary' : 'border-transparent'
+              "
+              @click="galleryIndex = idx"
+            >
+              <img :src="url" class="h-full w-full object-cover" alt="thumbnail" />
+            </button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   </div>

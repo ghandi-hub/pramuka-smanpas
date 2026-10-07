@@ -27,6 +27,7 @@ export interface SkuProgress {
   status: ProgressStatus;
   notes?: string | null;
   evidence_url?: string | null;
+  evidence_photos?: string[] | null;
   admin_notes?: string | null;
   submitted_at?: string | null;
   verified_at?: string | null;
@@ -59,6 +60,7 @@ export function useSkuService() {
     point_id: string;
     notes?: string;
     evidence_url?: string;
+    evidence_photos?: string[];
   }): Promise<SkuProgress> => {
     return await $fetch<SkuProgress>("/api/sku/progress", {
       method: "POST",

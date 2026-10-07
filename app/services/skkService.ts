@@ -35,6 +35,7 @@ export interface SkkProgress {
   status: ProgressStatus;
   notes?: string | null;
   evidence_url?: string | null;
+  evidence_photos?: string[] | null;
   admin_notes?: string | null;
   submitted_at?: string | null;
   verified_at?: string | null;
@@ -68,6 +69,7 @@ export function useSkkService() {
     level: SkkLevel;
     notes?: string;
     evidence_url?: string;
+    evidence_photos?: string[];
   }): Promise<SkkProgress> => {
     return await $fetch<SkkProgress>("/api/skk/progress", {
       method: "POST",

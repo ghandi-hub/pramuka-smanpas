@@ -28,15 +28,29 @@ onMounted(() => {
 
 const isMobileMenuOpen = ref(false)
 
-const links = computed(() => [
-  { name: t('nav.home'), path: localePath('/') },
-  { name: t('nav.about'), path: localePath('/about') },
-  { name: t('nav.activities'), path: localePath('/activities') },
-  { name: t('nav.sku'), path: localePath('/sku') },
-  { name: t('nav.skk'), path: localePath('/skk') },
-  { name: t('nav.members'), path: localePath('/members') },
-  { name: t('nav.contact'), path: localePath('/contact') },
-])
+const isMember = computed(() => profile.value?.role === 'member')
+
+const links = computed(() => {
+  const list = [
+    { name: t('nav.home'), path: localePath('/') },
+    { name: t('nav.about'), path: localePath('/about') },
+    { name: t('nav.activities'), path: localePath('/activities') },
+  ]
+
+  if (isMember.value) {
+    list.push(
+      { name: t('nav.sku'), path: localePath('/sku') },
+      { name: t('nav.skk'), path: localePath('/skk') },
+    )
+  }
+
+  list.push(
+    { name: t('nav.members'), path: localePath('/members') },
+    { name: t('nav.contact'), path: localePath('/contact') },
+  )
+
+  return list
+})
 
 function toggleMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value

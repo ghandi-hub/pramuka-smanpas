@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import { useI18n, useLocalePath } from "#imports"
 const { t } = useI18n()
 const localePath = useLocalePath()
+const { profile } = useAdminAuth()
+const isMember = computed(() => profile.value?.role === 'member')
 
 </script>
 
@@ -37,11 +40,11 @@ const localePath = useLocalePath()
               <NuxtLink :to="localePath('/activities')" class="text-sm text-muted-foreground hover:text-primary transition-colors">
                 {{ t("footer.latestActivities") }}</NuxtLink>
             </li>
-            <li>
+            <li v-if="isMember">
               <NuxtLink :to="localePath('/sku')" class="text-sm text-muted-foreground hover:text-primary transition-colors">{{ t("footer.sku") }}
                 </NuxtLink>
             </li>
-            <li>
+            <li v-if="isMember">
               <NuxtLink :to="localePath('/skk')" class="text-sm text-muted-foreground hover:text-primary transition-colors">{{ t("footer.skk") }}
                 </NuxtLink>
             </li>

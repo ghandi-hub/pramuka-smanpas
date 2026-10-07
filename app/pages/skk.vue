@@ -1,4 +1,6 @@
 <script setup lang="ts">
+definePageMeta({ middleware: "member" });
+
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "#imports";
 import {

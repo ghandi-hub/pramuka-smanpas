@@ -34,7 +34,13 @@ onMounted(() => {
         id: "unauthorized-toast"
       });
     });
-    // Remove query param without refreshing
+    router.replace({ query: {} });
+  } else if (route.query.need_login) {
+    import("vue-sonner").then(({ toast }) => {
+      toast.info("Silakan login dengan akun anggota terlebih dahulu untuk mengakses fitur SKU & SKK Digital", {
+        id: "need-login-toast"
+      });
+    });
     router.replace({ query: {} });
   }
 });

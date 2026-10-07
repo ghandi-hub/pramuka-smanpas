@@ -14,8 +14,8 @@ services:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=3000
-      - MONGODB_URI=${MONGODB_URI}
-      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio}
+      - MONGODB_URI=${MONGODB_DOCKER_URI:-${MONGODB_URI}}
+      - MINIO_ENDPOINT=${MINIO_DOCKER_ENDPOINT:-minio}
       - MINIO_PORT=${MINIO_PORT:-9000}
       - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL:-https://s3.codexlab.my.id/pramuka}
       - JWT_SECRET=${JWT_SECRET}

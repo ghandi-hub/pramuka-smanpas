@@ -19,10 +19,22 @@ export const getMinioConfig = (): MinioConfig => {
     // runtimeConfig not ready or in worker
   }
 
-  const endpoint =
+  let endpoint =
     process.env.MINIO_ENDPOINT ||
     (runtimeConfig.minioEndpoint as string) ||
     '127.0.0.1';
+
+  // Auto-detect container runtime if pointing to loopback
+  if (endpoint === '127.0.0.1' || endpoint === 'localhost') {
+    try {
+      const { existsSync } = require('node:fs');
+      if (existsSync('/.dockerenv') || process.env.DOCKER_CONTAINER) {
+        endpoint = 'minio';
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   const portRaw =
     process.env.MINIO_PORT ??

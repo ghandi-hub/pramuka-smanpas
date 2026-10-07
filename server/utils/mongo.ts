@@ -12,13 +12,27 @@ export async function getMongoClient(): Promise<MongoClient> {
 
   if (!clientPromise) {
     const config = useRuntimeConfig();
-    const uri = config.mongodbUri || process.env.MONGODB_URI;
+    let uri = config.mongodbUri || process.env.MONGODB_URI;
 
     if (!uri) {
       throw createError({
         statusCode: 500,
         statusMessage: "MongoDB URI configuration is missing.",
       });
+    }
+
+    // Auto-detect container runtime if pointing to loopback
+    if (uri.includes("@127.0.0.1:27017") || uri.includes("@localhost:27017")) {
+      try {
+        const { existsSync } = await import("node:fs");
+        if (existsSync("/.dockerenv") || process.env.DOCKER_CONTAINER) {
+          uri = uri
+            .replace("@127.0.0.1:27017", "@mongodb:27017")
+            .replace("@localhost:27017", "@mongodb:27017");
+        }
+      } catch {
+        // ignore check failure
+      }
     }
 
     const mongoClient = new MongoClient(uri);

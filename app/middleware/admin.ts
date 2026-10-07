@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   const payload = decodeJwtPayload(token.value);
   if (!payload || payload.role !== "admin") {
-    return navigateTo("/sku?unauthorized=true");
+    return navigateTo("/member?unauthorized=true");
   }
 
   if (import.meta.client && !profile.value) {

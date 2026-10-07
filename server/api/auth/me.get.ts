@@ -40,6 +40,7 @@ export default defineEventHandler(async (event) => {
       name: transformed.name,
       email: transformed.email,
       role: transformed.role,
+      religion: transformed.religion ?? null,
       avatar_url: transformed.avatar_url,
       created_at: transformed.created_at,
     };

@@ -8,6 +8,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
     if (payload?.role === "admin") {
       return navigateTo("/admin?already_logged_in=true");
     }
-    return navigateTo("/sku?already_logged_in=true");
+    return navigateTo("/member?already_logged_in=true");
   }
 });

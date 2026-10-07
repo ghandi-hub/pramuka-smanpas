@@ -61,7 +61,7 @@ const handleLogin = async () => {
     if (response.user?.role === "admin") {
       router.push("/admin");
     } else {
-      router.push("/sku");
+      router.push("/member");
     }
   } catch (e: any) {
     if (e.statusCode === 403) {

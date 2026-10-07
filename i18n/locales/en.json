@@ -281,6 +281,79 @@
       "tooltip": "The {level} level is locked. The {prev} level of this badge must be passed (verified) first."
     }
   },
+  "member": {
+    "sidebar": {
+      "brand": "Scout Member",
+      "badge": "Scout Member",
+      "dashboard": "Overview",
+      "sku": "SKU Book",
+      "skk": "Digital SKK",
+      "profile": "Account Settings",
+      "viewPublic": "View Public Site",
+      "logout": "Logout"
+    },
+    "dashboard": {
+      "greeting": "Hello, {name}!",
+      "subtitle": "Welcome to the member dashboard of Scouts SMAN 1 Pasawahan.",
+      "stats": {
+        "name": "Full Name",
+        "level": "Level",
+        "religion": "Religion",
+        "sku": "SKU Points Passed",
+        "skk": "Verified SKK",
+        "badge": "Badge Status"
+      },
+      "level": {
+        "bantara": "Penegak Bantara",
+        "laksana": "Penegak Laksana"
+      },
+      "badge": {
+        "bantara": "Bantara Badge",
+        "laksana": "Laksana Badge",
+        "none": "No Badge Yet"
+      },
+      "points": "points",
+      "progressTitle": "Proficiency Progress",
+      "quickActions": {
+        "title": "Quick Actions",
+        "sku_desc": "View and submit General Proficiency Requirement exams.",
+        "skk_desc": "Explore the catalog and submit Special Proficiency verification.",
+        "open": "Open"
+      }
+    },
+    "profile": {
+      "title": "Account Settings",
+      "subtitle": "Manage your personal information and account security",
+      "detail": "Profile Details",
+      "detail_desc": "Update your basic profile information and avatar.",
+      "avatar": "Profile Avatar",
+      "avatar_hint": "Recommended 1:1 ratio, JPG/PNG max 2MB.",
+      "name": "Full Name",
+      "name_placeholder": "Enter your full name",
+      "email": "Email Address",
+      "religion": "Religion",
+      "religion_hint": "Changing your religion instantly syncs the sub-points of SKU Point 1.",
+      "role": "User Role",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "security": "Account Security",
+      "security_desc": "Change your password to keep your account secure.",
+      "old_password": "Old Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "confirm_hint": "Make sure it matches your new password.",
+      "update_password": "Update Password",
+      "updating": "Updating...",
+      "success_profile": "Profile updated successfully!",
+      "success_password": "Password changed successfully!",
+      "error_name": "Name and email are required.",
+      "error_password_fields": "All password fields are required.",
+      "error_password_match": "Password confirmation does not match.",
+      "error_password_length": "New password must be at least 6 characters.",
+      "error_profile": "Failed to update profile.",
+      "error_password": "Failed to change password."
+    }
+  },
   "twibbon": {
     "upload": {
       "label": "Upload Your Photo",

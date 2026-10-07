@@ -104,6 +104,7 @@ export default defineEventHandler(async (event) => {
       email: user.email,
       avatar_url: profile.avatar_url,
       role: profile.role,
+      religion: profile.religion ?? null,
     },
   };
 });

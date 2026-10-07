@@ -31,25 +31,13 @@ const isMobileMenuOpen = ref(false)
 const isMember = computed(() => profile.value?.role === 'member')
 
 const links = computed(() => {
-  const list = [
+  return [
     { name: t('nav.home'), path: localePath('/') },
     { name: t('nav.about'), path: localePath('/about') },
     { name: t('nav.activities'), path: localePath('/activities') },
-  ]
-
-  if (isMember.value) {
-    list.push(
-      { name: t('nav.sku'), path: localePath('/sku') },
-      { name: t('nav.skk'), path: localePath('/skk') },
-    )
-  }
-
-  list.push(
     { name: t('nav.members'), path: localePath('/members') },
     { name: t('nav.contact'), path: localePath('/contact') },
-  )
-
-  return list
+  ]
 })
 
 function toggleMenu() {
@@ -103,9 +91,9 @@ function toggleMenu() {
 
           <!-- Logged in state -->
           <template v-else-if="profile">
-            <NuxtLink :to="profile.role === 'admin' ? localePath('/admin') : localePath('/sku')"
+            <NuxtLink :to="profile.role === 'admin' ? localePath('/admin') : localePath('/member')"
               class="hidden md:inline-flex h-10 items-center justify-center rounded-sm bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20">
-              <span>{{ profile.role === 'admin' ? 'Admin' : (profile.name || 'SKU Saya') }}</span>
+              <span>{{ profile.role === 'admin' ? 'Admin' : 'Dashboard Member' }}</span>
             </NuxtLink>
 
             <button @click="handleLogout"
@@ -150,10 +138,10 @@ function toggleMenu() {
               <span class="font-medium text-foreground">{{ profile.name || profile.email }}</span>
               <span class="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">{{ profile.role }}</span>
             </div>
-            <NuxtLink :to="profile.role === 'admin' ? localePath('/admin') : localePath('/sku')"
+            <NuxtLink :to="profile.role === 'admin' ? localePath('/admin') : localePath('/member')"
               class="inline-flex h-12 w-full items-center justify-center rounded-sm bg-primary px-8 text-base font-medium text-primary-foreground"
               @click="isMobileMenuOpen = false">
-              {{ profile.role === 'admin' ? 'Dashboard Admin' : 'Halaman SKU & SKK' }}
+              {{ profile.role === 'admin' ? 'Dashboard Admin' : 'Dashboard Member' }}
             </NuxtLink>
             <button @click="() => { isMobileMenuOpen = false; handleLogout(); }"
               class="inline-flex h-12 w-full items-center justify-center rounded-sm border border-destructive/40 text-base font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground">

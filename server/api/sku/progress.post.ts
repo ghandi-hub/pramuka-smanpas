@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { requireAuthUser } from "~~/server/utils/userAuth";
 import { getDb, transformDocument } from "~~/server/utils/mongo";
+import {
+  parseSkuSubPointId,
+  getPoint1SubPointIds,
+  SKU_RELIGIONS,
+} from "~~/shared/skuSubpoints";
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuthUser(event);
@@ -33,35 +38,81 @@ export default defineEventHandler(async (event) => {
   const collection = db.collection("sku_progress");
 
   // Cari butir SKU untuk mengetahui tingkatannya.
-  const pointIdStr = String(point_id);
+  // Jika point_id berupa sub-butir (contoh: 'bantara-1_sub_0'), ambil base item ('bantara-1').
+  const pointIdStr = String(point_id).trim();
+  const parsedSub = parseSkuSubPointId(pointIdStr);
+  const basePointId = parsedSub ? parsedSub.baseId : pointIdStr;
+
   const item = await db.collection("sku_items").findOne({
-    $or: [{ id: pointIdStr }, { _id: pointIdStr }],
+    $or: [{ id: basePointId }, { _id: basePointId }],
   });
 
+  const itemLevel =
+    item?.level ?? (basePointId.startsWith("laksana") ? "laksana" : "bantara");
+
   // Prasyarat: tingkat Laksana terkunci jika sisa butir Bantara belum lulus >= 3.
-  if (item?.level === "laksana") {
+  if (itemLevel === "laksana") {
     const bantaraItems = await db
       .collection("sku_items")
       .find({ level: "bantara" })
-      .project({ id: 1, _id: 1 })
+      .project({ id: 1, _id: 1, point_number: 1 })
       .toArray();
 
-    const bantaraIds: string[] = [];
-    for (const b of bantaraItems) {
-      if (b.id) bantaraIds.push(String(b.id));
-      if (b._id) bantaraIds.push(String(b._id));
-    }
+    const totalBantara = bantaraItems.length || 23;
 
-    const totalBantara = bantaraItems.length;
-    const verifiedBantara = totalBantara
-      ? await collection.countDocuments({
+    // Cek kelulusan Poin 1 Bantara:
+    // Lulus jika ada record 'bantara-1' verified, ATAU seluruh sub-butir salah satu agama verified.
+    let point1Verified = false;
+    const directP1 = await collection.findOne({
+      user_id: user.id,
+      status: "verified",
+      $or: [{ point_id: "bantara-1" }, { sku_item_id: "bantara-1" }],
+    });
+
+    if (directP1) {
+      point1Verified = true;
+    } else {
+      const verifiedSubs = await collection
+        .find({
           user_id: user.id,
           status: "verified",
-          point_id: { $in: bantaraIds },
+          point_id: { $regex: /^bantara-1_sub_/ },
         })
-      : 0;
+        .project({ point_id: 1 })
+        .toArray();
 
-    const remaining = totalBantara - verifiedBantara;
+      const verifiedSubSet = new Set(
+        verifiedSubs.map((d: any) => String(d.point_id)),
+      );
+
+      for (const r of SKU_RELIGIONS) {
+        const ids = getPoint1SubPointIds("bantara", r.key);
+        if (ids.length > 0 && ids.every((id) => verifiedSubSet.has(id))) {
+          point1Verified = true;
+          break;
+        }
+      }
+    }
+
+    // Butir Poin 2 s/d 23 Bantara
+    const nonP1BantaraIds: string[] = [];
+    for (const b of bantaraItems) {
+      const bId = String(b.id ?? b._id ?? "");
+      if (bId && bId !== "bantara-1") {
+        nonP1BantaraIds.push(bId);
+      }
+    }
+
+    const verifiedNonP1 = nonP1BantaraIds.length
+      ? await collection.distinct("point_id", {
+          user_id: user.id,
+          status: "verified",
+          point_id: { $in: nonP1BantaraIds },
+        })
+      : [];
+
+    const verifiedBantaraCount = (point1Verified ? 1 : 0) + verifiedNonP1.length;
+    const remaining = totalBantara - verifiedBantaraCount;
     if (remaining >= 3) {
       throw createError({
         statusCode: 400,
@@ -70,15 +121,14 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Gunakan pemisahan ketat antara $set dan $setOnInsert untuk mencegah konflik path di MongoDB
   await collection.updateOne(
-    { user_id: user.id, point_id },
+    { user_id: user.id, point_id: pointIdStr },
     {
       $set: {
-        user_id: user.id,
-        point_id,
-        sku_item_id: point_id,
+        sku_item_id: pointIdStr,
         status: "pending",
-        notes,
+        notes: notes ?? null,
         evidence_photos: photos,
         evidence_url: photos[0],
         submitted_at: now,
@@ -86,12 +136,17 @@ export default defineEventHandler(async (event) => {
       },
       $setOnInsert: {
         id: randomUUID(),
+        user_id: user.id,
+        point_id: pointIdStr,
         created_at: now,
       },
     },
     { upsert: true },
   );
 
-  const doc = await collection.findOne({ user_id: user.id, point_id });
+  const doc = await collection.findOne({
+    user_id: user.id,
+    point_id: pointIdStr,
+  });
   return transformDocument(doc);
 });

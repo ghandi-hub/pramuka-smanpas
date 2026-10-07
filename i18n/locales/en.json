@@ -190,6 +190,27 @@
       "examiner_notes": "Examiner Notes",
       "login_prompt": "Log in to submit an exam"
     },
+    "table": {
+      "no": "No",
+      "point": "Point",
+      "action": "Action",
+      "status": "Status",
+      "not_available": "-"
+    },
+    "point1": {
+      "badge": "Religious Point",
+      "religion_label": "Select Religion",
+      "subpoints": "Sub-points",
+      "submission_title": "Point {label}: {title}",
+      "summary": "{verified}/{total} sub-points passed"
+    },
+    "pagination": {
+      "showing": "Showing {from}-{to} of {total} points",
+      "per_page": "Per page",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {page}"
+    },
     "empty": "No SKU points for this filter yet.",
     "dialog": {
       "title": "Submit SKU Exam",

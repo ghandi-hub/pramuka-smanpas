@@ -5,16 +5,14 @@ export default defineEventHandler(async (event) => {
     
     // Only check auth for admin API routes
     if (url.pathname.startsWith('/api/admin')) {
+        let token: string | undefined;
         const authHeader = getHeader(event, 'Authorization')
-        
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            throw createError({
-                statusCode: 401,
-                statusMessage: 'Unauthorized'
-            })
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1]
+        } else {
+            token = getCookie(event, 'auth_token')
         }
 
-        const token = authHeader.split(' ')[1]
         if (!token) {
             throw createError({
                 statusCode: 401,

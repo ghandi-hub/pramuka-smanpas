@@ -1,7 +1,5 @@
 import type { Profiles } from "~/services/userService";
-
-let inFlightFetch: Promise<Profiles | null> | null = null;
-let inFlightRefresh: Promise<string | null> | null = null;
+import { decodeJwtPayload, isTokenValid } from "~/utils/jwtHelper";
 
 export const useAdminAuth = () => {
   const profile = useState<Profiles | null>("admin-profile", () => null);
@@ -18,71 +16,75 @@ export const useAdminAuth = () => {
   });
 
   const refreshAccessToken = async (): Promise<string | null> => {
-    if (inFlightRefresh) return inFlightRefresh;
+    if (import.meta.server) return null;
+    try {
+      const response = (await $fetch("/api/auth/refresh", {
+        method: "POST",
+      })) as any;
 
-    inFlightRefresh = (async () => {
-      try {
-        const response = (await $fetch("/api/auth/refresh", {
-          method: "POST",
-        })) as any;
-
-        if (response?.token) {
-          token.value = response.token;
-          return response.token as string;
-        }
-        await clearProfile();
-        return null;
-      } catch (e) {
-        await clearProfile();
-        return null;
-      } finally {
-        inFlightRefresh = null;
+      if (response?.token) {
+        token.value = response.token;
+        return response.token as string;
       }
-    })();
-
-    return inFlightRefresh;
+      await clearProfile();
+      return null;
+    } catch {
+      await clearProfile();
+      return null;
+    }
   };
 
   const fetchProfile = async (isRetry = false): Promise<Profiles | null> => {
-    if (!token.value) {
+    if (!token.value || !isTokenValid(token.value)) {
       profile.value = null;
       return null;
     }
 
     if (profile.value) return profile.value;
-    if (inFlightFetch) return inFlightFetch;
-
-    loading.value = true;
-    inFlightFetch = (async () => {
-      try {
-        const data = await $fetch("/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        });
-
-        if (data) {
-          profile.value = data as Profiles;
-          return profile.value;
-        }
-        return null;
-      } catch (e: any) {
-        if (e.statusCode === 401 && !isRetry) {
-          const newToken = await refreshAccessToken();
-          if (newToken) {
-            return await fetchProfile(true);
-          }
-        }
-        profile.value = null;
-        token.value = null;
-        return null;
-      } finally {
-        loading.value = false;
-        inFlightFetch = null;
+    if (import.meta.server) {
+      // Pada SSR, ekstrak data dasar dari token JWT untuk menghindari SSR network deadlock
+      const payload = decodeJwtPayload(token.value);
+      if (payload?.id && payload?.role) {
+        profile.value = {
+          id: payload.id,
+          role: payload.role as any,
+          email: "",
+          name: "",
+          avatar_url: null,
+          created_at: "",
+        };
+        return profile.value;
       }
-    })();
+      return null;
+    }
 
-    return inFlightFetch;
+    if (loading.value) return profile.value;
+    loading.value = true;
+    try {
+      const data = await $fetch("/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+
+      if (data) {
+        profile.value = data as Profiles;
+        return profile.value;
+      }
+      return null;
+    } catch (e: any) {
+      if (e.statusCode === 401 && !isRetry) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          return await fetchProfile(true);
+        }
+      }
+      profile.value = null;
+      token.value = null;
+      return null;
+    } finally {
+      loading.value = false;
+    }
   };
 
   const updateProfile = async (data: Partial<Profiles>) => {

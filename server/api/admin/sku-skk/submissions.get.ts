@@ -1,5 +1,11 @@
 import type { H3Event } from "h3";
 import { getDb, transformDocument } from "~~/server/utils/mongo";
+import {
+  parseSkuSubPointId,
+  resolvePoint1SubPoint,
+  normalizeSkuLevel,
+  type SkuLevelKey,
+} from "~~/shared/skuSubpoints";
 
 type SubmissionType = "all" | "sku" | "skk";
 type SubmissionStatus = "all" | "pending" | "verified" | "rejected";
@@ -61,9 +67,24 @@ async function buildSkuItemMap(db: any, itemIds: string[]) {
   const map = new Map<string, { point_number: any; title: any; level: any }>();
   if (!itemIds.length) return map;
 
+  const queryIds = new Set<string>();
+  for (const rawId of itemIds) {
+    if (!rawId) continue;
+    queryIds.add(rawId);
+    const parsed = parseSkuSubPointId(rawId);
+    if (parsed) {
+      queryIds.add(parsed.baseId);
+    }
+  }
+
   const items = await db
     .collection("sku_items")
-    .find({ $or: [{ id: { $in: itemIds } }, { _id: { $in: itemIds } }] })
+    .find({
+      $or: [
+        { id: { $in: Array.from(queryIds) } },
+        { _id: { $in: Array.from(queryIds) } },
+      ],
+    })
     .toArray();
 
   for (const item of items) {
@@ -76,6 +97,27 @@ async function buildSkuItemMap(db: any, itemIds: string[]) {
     const _id = asId(item._id);
     if (id) map.set(id, payload);
     if (_id) map.set(_id, payload);
+  }
+
+  // Format sub-butir jika point_id adalah sub-butir (contoh: 'bantara-1_sub_0')
+  for (const rawId of itemIds) {
+    const parsed = parseSkuSubPointId(rawId);
+    if (!parsed) continue;
+
+    const baseItem = map.get(parsed.baseId);
+    const level: SkuLevelKey =
+      normalizeSkuLevel(baseItem?.level) ??
+      (parsed.baseId.startsWith("laksana") ? "laksana" : "bantara");
+
+    const sub = resolvePoint1SubPoint(level, parsed.subIndex);
+    const label = sub ? sub.label : `1.${parsed.subIndex + 1}`;
+    const subTitle = sub ? sub.title : "Sub-butir Keagamaan";
+
+    map.set(rawId, {
+      point_number: null,
+      title: `Poin ${label}: ${subTitle}`,
+      level,
+    });
   }
 
   return map;

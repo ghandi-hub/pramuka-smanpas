@@ -132,7 +132,9 @@ const load = async () => {
 const itemTitle = (s: Submission): string => {
   if (!s.item) return "-";
   if (s.type === "sku") {
-    return `${s.item.point_number ?? ""}. ${s.item.title ?? "-"}`;
+    if (s.item.title?.startsWith("Poin ")) return s.item.title;
+    if (s.item.point_number) return `${s.item.point_number}. ${s.item.title ?? "-"}`;
+    return s.item.title ?? "-";
   }
   return s.item.name ?? "-";
 };

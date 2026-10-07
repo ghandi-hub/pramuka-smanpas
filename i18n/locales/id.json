@@ -190,6 +190,27 @@
       "examiner_notes": "Catatan Penguji",
       "login_prompt": "Masuk untuk mengajukan ujian"
     },
+    "table": {
+      "no": "No",
+      "point": "Poin",
+      "action": "Aksi",
+      "status": "Status",
+      "not_available": "-"
+    },
+    "point1": {
+      "badge": "Butir Agama",
+      "religion_label": "Pilih Agama",
+      "subpoints": "Sub-butir",
+      "submission_title": "Poin {label}: {title}",
+      "summary": "{verified}/{total} sub-butir lulus"
+    },
+    "pagination": {
+      "showing": "Menampilkan {from}-{to} dari {total} butir",
+      "per_page": "Per halaman",
+      "prev": "Sebelumnya",
+      "next": "Berikutnya",
+      "page": "Halaman {page}"
+    },
     "empty": "Belum ada butir SKU untuk filter ini.",
     "dialog": {
       "title": "Ajukan Ujian SKU",

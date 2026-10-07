@@ -74,6 +74,9 @@ export default defineEventHandler(async (event) => {
     { user_id: user.id, point_id },
     {
       $set: {
+        user_id: user.id,
+        point_id,
+        sku_item_id: point_id,
         status: "pending",
         notes,
         evidence_photos: photos,
@@ -83,8 +86,6 @@ export default defineEventHandler(async (event) => {
       },
       $setOnInsert: {
         id: randomUUID(),
-        user_id: user.id,
-        point_id,
         created_at: now,
       },
     },

@@ -245,7 +245,7 @@ const handleLogout = async () => {
           </div>
         </header>
 
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 w-full max-w-7xl mx-auto">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 pb-8 w-full max-w-7xl mx-auto">
           <slot />
         </main>
       </div>
@@ -263,10 +263,15 @@ const handleLogout = async () => {
       <Transition name="member-slide">
         <aside
           v-if="mobileOpen"
-          class="fixed inset-y-0 right-0 z-50 w-72 flex flex-col bg-sidebar border-l border-sidebar-border shadow-2xl lg:hidden"
+          class="fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-sidebar border-r border-sidebar-border shadow-2xl lg:hidden"
         >
           <div class="flex items-center justify-between px-5 h-16 border-b border-sidebar-border shrink-0">
-            <span class="font-display font-bold text-sm">Member Area</span>
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 overflow-hidden">
+                <img src="/images/logo.webp" alt="Pramuka Logo" class="w-full h-full object-contain" />
+              </div>
+              <span class="font-display font-bold text-sm">Member Area</span>
+            </div>
             <button class="p-1.5 rounded-lg hover:bg-sidebar-accent/50 text-sidebar-foreground/70" @click="mobileOpen = false">
               <X class="w-5 h-5" />
             </button>
@@ -326,25 +331,6 @@ const handleLogout = async () => {
         </aside>
       </Transition>
     </Teleport>
-
-    <!-- ==================== MOBILE BOTTOM NAV ==================== -->
-    <nav
-      class="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur-md"
-      style="padding-bottom: env(safe-area-inset-bottom)"
-    >
-      <div class="grid grid-cols-4">
-        <NuxtLink
-          v-for="item in menuItems"
-          :key="item.to"
-          :to="item.to"
-          class="flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-colors"
-          :class="isActive(item) ? 'text-primary' : 'text-muted-foreground'"
-        >
-          <component :is="item.icon" class="w-5 h-5" />
-          <span class="truncate max-w-full px-1">{{ item.label }}</span>
-        </NuxtLink>
-      </div>
-    </nav>
   </div>
 </template>
 
@@ -363,6 +349,6 @@ const handleLogout = async () => {
 }
 .member-slide-enter-from,
 .member-slide-leave-to {
-  transform: translateX(100%);
+  transform: translateX(-100%);
 }
 </style>

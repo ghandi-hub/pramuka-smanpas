@@ -335,6 +335,7 @@
         "badge": "Status Lencana"
       },
       "level": {
+        "calon": "Calon Penegak",
         "bantara": "Penegak Bantara",
         "laksana": "Penegak Laksana"
       },

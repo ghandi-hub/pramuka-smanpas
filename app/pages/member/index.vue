@@ -108,12 +108,23 @@ const bantaraTotal = computed(() => bantaraItems.value.length || 23);
 const laksanaVerified = computed(() =>
   countVerified(laksanaItems.value, "laksana"),
 );
-
-const currentLevel = computed<SkuLevelKey>(() =>
-  bantaraTotal.value > 0 && bantaraVerified.value >= bantaraTotal.value
-    ? "laksana"
-    : "bantara",
+const bantaraRemaining = computed(() =>
+  Math.max(0, bantaraTotal.value - bantaraVerified.value),
 );
+
+type MemberTingkat = "calon" | "bantara" | "laksana";
+
+const currentLevel = computed<MemberTingkat>(() => {
+  const laksanaTotal = laksanaItems.value.length;
+  if (laksanaTotal > 0 && laksanaVerified.value >= laksanaTotal) {
+    return "laksana";
+  }
+  // Jika butir Bantara belum terpenuhi atau belum minimal sisa kosong <= 3
+  if (bantaraRemaining.value > 3) {
+    return "calon";
+  }
+  return "bantara";
+});
 
 const levelLabel = computed(() =>
   t(`member.dashboard.level.${currentLevel.value}`),
@@ -158,15 +169,18 @@ const stats = computed(() => [
     label: t("member.dashboard.stats.level"),
     value: levelLabel.value,
     icon: Layers,
-    accent: "text-emerald-600",
-    bg: "bg-emerald-500/10",
-  },
-  {
-    label: t("member.dashboard.stats.religion"),
-    value: religionLabel.value,
-    icon: Sparkles,
-    accent: "text-violet-600",
-    bg: "bg-violet-500/10",
+    accent:
+      currentLevel.value === "calon"
+        ? "text-sky-600 dark:text-sky-400"
+        : currentLevel.value === "laksana"
+          ? "text-amber-600 dark:text-amber-400"
+          : "text-emerald-600 dark:text-emerald-400",
+    bg:
+      currentLevel.value === "calon"
+        ? "bg-sky-500/10"
+        : currentLevel.value === "laksana"
+          ? "bg-amber-500/10"
+          : "bg-emerald-500/10",
   },
   {
     label: t("member.dashboard.stats.sku"),

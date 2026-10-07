@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: "member", middleware: "member" });
 
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useAsyncData, useHead, useI18n, useSeoMeta } from "#imports";
 import {
   CheckCircle2,
@@ -15,6 +15,8 @@ import {
   Lock,
   AlertTriangle,
   Award,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-vue-next";
 import Button from "~/components/ui/button/Button.vue";
 import {
@@ -59,19 +61,20 @@ const colorHex: Record<string, string> = {
 
 const activeField = ref<SkkColorCode | "all">("all");
 
-const { data: skkData, pending: loading, refresh } = await useAsyncData(
-  "member-skk-data",
-  async () => {
-    const [fetchedItems, fetchedProgress] = await Promise.all([
-      fetchItems(),
-      fetchProgress(),
-    ]);
-    return {
-      items: fetchedItems || [],
-      progress: fetchedProgress || [],
-    };
-  },
-);
+const {
+  data: skkData,
+  pending: loading,
+  refresh,
+} = await useAsyncData("member-skk-data", async () => {
+  const [fetchedItems, fetchedProgress] = await Promise.all([
+    fetchItems(),
+    fetchProgress(),
+  ]);
+  return {
+    items: fetchedItems || [],
+    progress: fetchedProgress || [],
+  };
+});
 
 const items = computed<SkkItem[]>(() => skkData.value?.items ?? []);
 const progress = computed<SkkProgress[]>(() => skkData.value?.progress ?? []);
@@ -105,13 +108,52 @@ const filteredItems = computed(() => {
   return items.value.filter((i) => i.color_code === activeField.value);
 });
 
+// Pagination
+const currentPage = ref(1);
+const pageSize = ref(5);
+
+const totalItems = computed(() => filteredItems.value.length);
+const totalPages = computed(() =>
+  Math.ceil(totalItems.value / pageSize.value) || 1,
+);
+
+const paginatedItems = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return filteredItems.value.slice(start, start + pageSize.value);
+});
+
+const displayedPages = computed<(number | string)[]>(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, "...", total];
+  }
+  if (current >= total - 3) {
+    return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [1, "...", current - 1, current, current + 1, "...", total];
+});
+
+watch(activeField, () => {
+  currentPage.value = 1;
+});
+
+watch(items, () => {
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = 1;
+  }
+});
+
 const statusOf = (skkId: string, level: SkkLevel): ProgressStatus | "none" => {
   return progressMap.value.get(`${skkId}:${level}`)?.status ?? "none";
 };
 
 const previousLevel = (level: SkkLevel): SkkLevel | null => {
   const idx = levelIndex[level];
-  return idx > 0 ? skkLevels[idx - 1] ?? null : null;
+  return idx > 0 ? (skkLevels[idx - 1] ?? null) : null;
 };
 
 // Tingkat terkunci jika tingkat sebelumnya pada TKK sama belum verified
@@ -137,7 +179,10 @@ const verifiedCount = computed(() => {
 });
 const percentage = computed(() => {
   if (!totalTargetCount.value) return 0;
-  return Math.min(100, Math.round((verifiedCount.value / totalTargetCount.value) * 100));
+  return Math.min(
+    100,
+    Math.round((verifiedCount.value / totalTargetCount.value) * 100),
+  );
 });
 
 // Level Status Meta for Compact Badges
@@ -160,7 +205,8 @@ const getLevelStatusInfo = (skkId: string, lvl: SkkLevel) => {
       return {
         label: t("skk.status_short.verified"),
         fullLabel: t("skk.status.verified"),
-        class: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-semibold",
+        class:
+          "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-semibold",
         icon: CheckCircle2,
         iconClass: "text-emerald-600 dark:text-emerald-400",
         isLocked: false,
@@ -169,7 +215,8 @@ const getLevelStatusInfo = (skkId: string, lvl: SkkLevel) => {
       return {
         label: t("skk.status_short.pending"),
         fullLabel: t("skk.status.pending"),
-        class: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 font-semibold",
+        class:
+          "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 font-semibold",
         icon: Clock,
         iconClass: "text-amber-600 dark:text-amber-400",
         isLocked: false,
@@ -178,7 +225,8 @@ const getLevelStatusInfo = (skkId: string, lvl: SkkLevel) => {
       return {
         label: t("skk.status_short.rejected"),
         fullLabel: t("skk.status.rejected"),
-        class: "bg-destructive/10 text-destructive border-destructive/30 font-semibold",
+        class:
+          "bg-destructive/10 text-destructive border-destructive/30 font-semibold",
         icon: FileWarning,
         iconClass: "text-destructive",
         isLocked: false,
@@ -243,7 +291,9 @@ const selectLevel = (lvl: SkkLevel) => {
   const existing = progressMap.value.get(`${activeItem.value?.id}:${lvl}`);
   notes.value = existing?.notes ?? "";
   const existingPhotos = Array.isArray(existing?.evidence_photos)
-    ? existing.evidence_photos.filter((p: unknown) => typeof p === "string" && p)
+    ? existing.evidence_photos.filter(
+        (p: unknown) => typeof p === "string" && p,
+      )
     : existing?.evidence_url
       ? [existing.evidence_url]
       : [];
@@ -252,7 +302,9 @@ const selectLevel = (lvl: SkkLevel) => {
 
 const currentProgress = computed(() => {
   if (!activeItem.value) return null;
-  return progressMap.value.get(`${activeItem.value.id}:${activeLevel.value}`) || null;
+  return (
+    progressMap.value.get(`${activeItem.value.id}:${activeLevel.value}`) || null
+  );
 });
 
 const activeRequirements = computed<string[]>(() => {
@@ -272,9 +324,15 @@ const uploadedPhotos = computed<string[]>(() => {
   const p = currentProgress.value;
   if (!p) return [];
   if (Array.isArray(p.evidence_photos) && p.evidence_photos.length) {
-    return p.evidence_photos.filter((url: unknown) => typeof url === "string" && url.trim().length > 0);
+    return p.evidence_photos.filter(
+      (url: unknown) => typeof url === "string" && url.trim().length > 0,
+    );
   }
-  if (p.evidence_url && typeof p.evidence_url === "string" && p.evidence_url.trim().length > 0) {
+  if (
+    p.evidence_url &&
+    typeof p.evidence_url === "string" &&
+    p.evidence_url.trim().length > 0
+  ) {
     return [p.evidence_url];
   }
   return [];
@@ -337,24 +395,37 @@ useSeoMeta({
 <template>
   <div class="flex flex-col gap-6">
     <!-- Page Heading -->
-    <div class="relative overflow-hidden rounded-2xl bg-card border border-border p-6 sm:p-8 shadow-sm">
+    <!-- <div
+      class="relative overflow-hidden rounded-2xl bg-card border border-border p-6 sm:p-8 shadow-sm"
+    >
       <div
         class="absolute -right-16 -top-16 w-72 h-72 rounded-full opacity-10 blur-2xl pointer-events-none"
-        style="background: conic-gradient(#eab308, #dc2626, #f1f5f9, #16a34a, #2563eb)"
+        style="
+          background: conic-gradient(
+            #eab308,
+            #dc2626,
+            #f1f5f9,
+            #16a34a,
+            #2563eb
+          );
+        "
       />
       <div class="relative">
-        <p class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-3">
+        <p
+          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-3"
+        >
           <Star class="w-4 h-4" />
           {{ t("skk.header.badge") }}
         </p>
-        <h1 class="font-display text-2xl lg:text-3xl font-bold text-foreground mb-2">
+        <h1
+          class="font-display text-2xl lg:text-3xl font-bold text-foreground mb-2"
+        >
           {{ t("skk.header.title") }}
         </h1>
         <p class="text-muted-foreground max-w-3xl leading-relaxed">
           {{ t("skk.header.description") }}
         </p>
 
-        <!-- Color legends -->
         <div class="flex flex-wrap gap-2.5 mt-5">
           <div
             v-for="f in fields.filter((x) => x.value !== 'all')"
@@ -369,13 +440,17 @@ useSeoMeta({
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Progress Card -->
     <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4"
+      >
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+          <div
+            class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0"
+          >
             <Award class="w-6 h-6" />
           </div>
           <div>
@@ -389,9 +464,14 @@ useSeoMeta({
         </div>
         <div class="flex items-center gap-3">
           <span class="text-sm font-semibold text-muted-foreground">
-            <span class="text-primary text-base font-bold">{{ verifiedCount }}</span> / {{ totalTargetCount }} Tingkat Lulus
+            <span class="text-primary text-base font-bold">{{
+              verifiedCount
+            }}</span>
+            / {{ totalTargetCount }} Tingkat Lulus
           </span>
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
+          <span
+            class="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary"
+          >
             {{ percentage }}%
           </span>
         </div>
@@ -435,24 +515,34 @@ useSeoMeta({
     </div>
 
     <!-- TABEL RINGKAS KATALOG TKK -->
-    <div class="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+    <div
+      class="bg-card border border-border rounded-2xl shadow-sm overflow-hidden"
+    >
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <th scope="col" class="py-4 px-3 w-14 text-center whitespace-nowrap">
+            <tr
+              class="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
+              <th
+                scope="col"
+                class="py-4 px-3 w-14 text-center whitespace-nowrap"
+              >
                 {{ t("skk.table.no") }}
               </th>
               <th scope="col" class="py-4 px-4 min-w-[260px]">
                 {{ t("skk.table.tkk") }}
               </th>
-              <th scope="col" class="py-4 px-4 min-w-[170px]">
+              <!-- <th scope="col" class="py-4 px-4 min-w-[170px]">
                 {{ t("skk.table.field") }}
-              </th>
+              </th> -->
               <th scope="col" class="py-4 px-4 min-w-[320px]">
                 {{ t("skk.table.level_progress") }}
               </th>
-              <th scope="col" class="py-4 px-4 w-28 text-center whitespace-nowrap">
+              <th
+                scope="col"
+                class="py-4 px-4 w-28 text-center whitespace-nowrap"
+              >
                 {{ t("skk.table.action") }}
               </th>
             </tr>
@@ -461,8 +551,12 @@ useSeoMeta({
             <!-- Loading State -->
             <tr v-if="loading && !items.length">
               <td colspan="5" class="py-16 text-center">
-                <Loader2 class="w-8 h-8 animate-spin mx-auto text-primary mb-2" />
-                <p class="text-sm text-muted-foreground">{{ t("skk.table.loading") }}</p>
+                <Loader2
+                  class="w-8 h-8 animate-spin mx-auto text-primary mb-2"
+                />
+                <p class="text-sm text-muted-foreground">
+                  {{ t("skk.table.loading") }}
+                </p>
               </td>
             </tr>
 
@@ -475,19 +569,23 @@ useSeoMeta({
 
             <!-- Table Rows -->
             <tr
-              v-for="(item, index) in filteredItems"
+              v-for="(item, index) in paginatedItems"
               :key="item.id"
               class="hover:bg-muted/30 transition-colors group"
             >
               <!-- 1. No -->
-              <td class="py-4 px-3 text-center text-xs font-semibold text-muted-foreground w-14 align-middle">
-                {{ index + 1 }}
+              <td
+                class="py-4 px-3 text-center text-xs font-semibold text-muted-foreground w-14 align-middle"
+              >
+                {{ (currentPage - 1) * pageSize + index + 1 }}
               </td>
 
               <!-- 2. TKK -->
               <td class="py-4 px-4 align-middle">
                 <div class="flex items-center gap-3">
-                  <div class="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border p-1 flex items-center justify-center">
+                  <div
+                    class="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden bg-muted/40 border border-border p-1 flex items-center justify-center"
+                  >
                     <img
                       :src="frameFor(item, 'purwa')"
                       class="absolute inset-0 w-full h-full object-contain"
@@ -502,17 +600,22 @@ useSeoMeta({
                   </div>
                   <div class="min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <span class="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
+                      <span
+                        class="font-bold text-sm text-foreground group-hover:text-primary transition-colors"
+                      >
                         {{ item.name }}
                       </span>
-                      <span
+                      <!-- <span
                         v-if="item.is_mandatory"
                         class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/30"
                       >
                         {{ t("skk.card.mandatory") }}
-                      </span>
+                      </span> -->
                     </div>
-                    <p v-if="item.description" class="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                    <p
+                      v-if="item.description"
+                      class="text-xs text-muted-foreground line-clamp-1 mt-0.5"
+                    >
                       {{ item.description }}
                     </p>
                   </div>
@@ -520,7 +623,7 @@ useSeoMeta({
               </td>
 
               <!-- 3. Bidang -->
-              <td class="py-4 px-4 align-middle whitespace-nowrap">
+              <!-- <td class="py-4 px-4 align-middle whitespace-nowrap">
                 <span
                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border"
                   :class="getFieldBadgeClass(item.color_code)"
@@ -531,7 +634,7 @@ useSeoMeta({
                   />
                   {{ t(`skk.fields_badge.${item.color_code}`) }}
                 </span>
-              </td>
+              </td> -->
 
               <!-- 4. Pencapaian Tingkat -->
               <td class="py-4 px-4 align-middle">
@@ -572,6 +675,73 @@ useSeoMeta({
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination Footer -->
+      <div
+        v-if="totalPages > 1"
+        class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t border-border bg-muted/20 text-xs text-muted-foreground"
+      >
+        <div>
+          Menampilkan
+          <span class="font-semibold text-foreground">
+            {{ (currentPage - 1) * pageSize + 1 }}
+          </span>
+          -
+          <span class="font-semibold text-foreground">
+            {{ Math.min(currentPage * pageSize, totalItems) }}
+          </span>
+          dari
+          <span class="font-semibold text-foreground">{{ totalItems }}</span>
+          TKK
+        </div>
+
+        <!-- Page Buttons -->
+        <div class="flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-8 px-2.5 text-xs"
+            :disabled="currentPage <= 1"
+            @click="currentPage--"
+          >
+            <ChevronLeft class="w-4 h-4 mr-1" />
+            Sebelumnya
+          </Button>
+
+          <template v-for="(p, idx) in displayedPages" :key="idx">
+            <span
+              v-if="p === '...'"
+              class="h-8 w-8 flex items-center justify-center text-muted-foreground font-semibold"
+            >
+              ...
+            </span>
+            <button
+              v-else
+              type="button"
+              class="h-8 w-8 rounded-lg font-semibold text-xs transition-colors"
+              :class="
+                p === currentPage
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'hover:bg-muted text-muted-foreground'
+              "
+              @click="currentPage = Number(p)"
+            >
+              {{ p }}
+            </button>
+          </template>
+
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-8 px-2.5 text-xs"
+            :disabled="currentPage >= totalPages"
+            @click="currentPage++"
+          >
+            Berikutnya
+            <ChevronRight class="w-4 h-4 ml-1" />
+          </Button>
+        </div>
+      </div>
     </div>
 
     <!-- DETAIL & FORM PENGAJUAN UJIAN DIALOG -->
@@ -581,7 +751,9 @@ useSeoMeta({
         <DialogHeader class="border-b border-border pb-4">
           <div class="flex items-start gap-4">
             <!-- Ikon TKK Besar (64x64) -->
-            <div class="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-muted/40 border border-border p-2 flex items-center justify-center">
+            <div
+              class="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-muted/40 border border-border p-2 flex items-center justify-center"
+            >
               <img
                 v-if="activeItem"
                 :src="frameFor(activeItem, activeLevel)"
@@ -606,7 +778,9 @@ useSeoMeta({
                 >
                   <span
                     class="w-2 h-2 rounded-full border border-black/10 shrink-0"
-                    :style="{ backgroundColor: colorHex[activeItem.color_code] }"
+                    :style="{
+                      backgroundColor: colorHex[activeItem.color_code],
+                    }"
                   />
                   {{ t(`skk.fields_badge.${activeItem.color_code}`) }}
                 </span>
@@ -618,10 +792,15 @@ useSeoMeta({
                 </span>
               </div>
 
-              <DialogTitle class="font-display text-xl sm:text-2xl font-bold text-foreground">
+              <DialogTitle
+                class="font-display text-xl sm:text-2xl font-bold text-foreground"
+              >
                 {{ activeItem?.name }}
               </DialogTitle>
-              <DialogDescription v-if="activeItem?.description" class="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">
+              <DialogDescription
+                v-if="activeItem?.description"
+                class="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2"
+              >
                 {{ activeItem.description }}
               </DialogDescription>
             </div>
@@ -629,7 +808,9 @@ useSeoMeta({
         </DialogHeader>
 
         <!-- Tabs Pilihan Tingkatan (Purwa | Madya | Utama) -->
-        <div class="inline-flex w-full p-1 rounded-xl border border-border bg-muted/40 gap-1">
+        <div
+          class="inline-flex w-full p-1 rounded-xl border border-border bg-muted/40 gap-1"
+        >
           <button
             v-for="lvl in skkLevels"
             :key="lvl"
@@ -647,7 +828,9 @@ useSeoMeta({
               class="w-3.5 h-3.5 text-amber-500 shrink-0"
             />
             <CheckCircle2
-              v-else-if="activeItem && statusOf(activeItem.id, lvl) === 'verified'"
+              v-else-if="
+                activeItem && statusOf(activeItem.id, lvl) === 'verified'
+              "
               class="w-3.5 h-3.5 text-emerald-500 shrink-0"
             />
             <span>{{ t(`skk.levels.${lvl}`) }}</span>
@@ -663,7 +846,9 @@ useSeoMeta({
           <div class="space-y-1">
             <p class="font-semibold flex items-center gap-2">
               {{ t("skk.lock.title") }}
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold uppercase tracking-wider">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold uppercase tracking-wider"
+              >
                 <Lock class="w-3 h-3" />
                 {{ t("skk.lock.badge") }}
               </span>
@@ -676,10 +861,14 @@ useSeoMeta({
 
         <!-- Rincian Syarat Kecakapan Lengkap -->
         <div v-if="activeItem" class="space-y-3">
-          <div class="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <div
+            class="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+          >
             <span class="flex items-center gap-1.5">
               <Award class="w-4 h-4 text-primary" />
-              {{ t("skk.dialog.requirements") }} ({{ t(`skk.levels.${activeLevel}`) }})
+              {{ t("skk.dialog.requirements") }} ({{
+                t(`skk.levels.${activeLevel}`)
+              }})
             </span>
             <span
               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border normal-case"
@@ -688,7 +877,9 @@ useSeoMeta({
               <component
                 :is="getLevelStatusInfo(activeItem.id, activeLevel).icon"
                 class="w-3 h-3"
-                :class="getLevelStatusInfo(activeItem.id, activeLevel).iconClass"
+                :class="
+                  getLevelStatusInfo(activeItem.id, activeLevel).iconClass
+                "
               />
               {{ getLevelStatusInfo(activeItem.id, activeLevel).fullLabel }}
             </span>
@@ -708,7 +899,10 @@ useSeoMeta({
                 </span>
                 <span class="flex-1">{{ req }}</span>
               </li>
-              <li v-if="!activeRequirements.length" class="text-xs text-muted-foreground italic">
+              <li
+                v-if="!activeRequirements.length"
+                class="text-xs text-muted-foreground italic"
+              >
                 {{ t("skk.dialog.no_requirements") }}
               </li>
             </ul>
@@ -719,8 +913,12 @@ useSeoMeta({
             v-if="currentProgress?.admin_notes"
             class="text-xs rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-amber-800 dark:text-amber-300"
           >
-            <span class="font-semibold">{{ t("skk.dialog.examiner_notes") }}:</span>
-            <p class="mt-1 leading-relaxed">{{ currentProgress.admin_notes }}</p>
+            <span class="font-semibold"
+              >{{ t("skk.dialog.examiner_notes") }}:</span
+            >
+            <p class="mt-1 leading-relaxed">
+              {{ currentProgress.admin_notes }}
+            </p>
           </div>
         </div>
 
@@ -732,7 +930,10 @@ useSeoMeta({
         >
           <!-- Catatan / Keterangan -->
           <div class="space-y-2">
-            <Label for="skk-notes" class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <Label
+              for="skk-notes"
+              class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+            >
               {{ t("skk.dialog.notes") }}
             </Label>
             <Textarea
@@ -747,7 +948,9 @@ useSeoMeta({
           <!-- Upload Foto Bukti (Mandatory & Multiple) -->
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <Label class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Label
+                class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 {{ t("skk.dialog.evidence") }}
               </Label>
               <span class="text-[11px] text-muted-foreground">
@@ -766,37 +969,43 @@ useSeoMeta({
           <!-- Tombol Ajukan -->
           <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
             <div class="text-xs text-muted-foreground">
-              <span v-if="!evidencePhotos.length" class="text-amber-600 dark:text-amber-400">
+              <span
+                v-if="!evidencePhotos.length"
+                class="text-amber-600 dark:text-amber-400"
+              >
                 * {{ t("skk.dialog.evidence_required") }}
               </span>
             </div>
 
-            <Button
-              type="submit"
-              :disabled="!canSubmit"
-              class="min-w-[140px]"
-            >
+            <Button type="submit" :disabled="!canSubmit" class="min-w-[140px]">
               <Loader2
                 v-if="submitting || uploading"
                 class="w-4 h-4 mr-2 animate-spin"
               />
-              <Lock
-                v-else-if="isCurrentLocked"
-                class="w-4 h-4 mr-2"
-              />
+              <Lock v-else-if="isCurrentLocked" class="w-4 h-4 mr-2" />
               <Send v-else class="w-4 h-4 mr-2" />
-              {{ submitting ? t("skk.dialog.sending") : t("skk.dialog.submit") }}
+              {{
+                submitting ? t("skk.dialog.sending") : t("skk.dialog.submit")
+              }}
             </Button>
           </div>
 
           <!-- Galeri Preview Foto Bukti Terunggah (jika pending atau verified) -->
           <div
-            v-if="uploadedPhotos.length && (currentProgress?.status === 'pending' || currentProgress?.status === 'verified')"
+            v-if="
+              uploadedPhotos.length &&
+              (currentProgress?.status === 'pending' ||
+                currentProgress?.status === 'verified')
+            "
             class="space-y-2.5 pt-4 border-t border-border/80"
           >
             <div class="flex items-center justify-between">
-              <Label class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {{ t("skk.dialog.evidence_uploaded") }} ({{ uploadedPhotos.length }})
+              <Label
+                class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                {{ t("skk.dialog.evidence_uploaded") }} ({{
+                  uploadedPhotos.length
+                }})
               </Label>
               <span
                 v-if="currentProgress?.status === 'verified'"

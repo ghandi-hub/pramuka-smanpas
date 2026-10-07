@@ -66,12 +66,14 @@ export default defineEventHandler(async (event) => {
       user_id: userId,
       token: newRefreshToken,
       expires_at: newExpiresAt,
-    }),
+    }) as any,
   );
+
+  const isSecure = getRequestURL(event).protocol === "https:";
 
   setCookie(event, "refresh_token", newRefreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     expires: newExpiresAt,
   });

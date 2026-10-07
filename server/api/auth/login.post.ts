@@ -85,11 +85,13 @@ export default defineEventHandler(async (event) => {
     token: refreshToken,
     expires_at: expiresAt,
   });
-  await db.collection("refresh_tokens").insertOne(tokenDoc);
+  await db.collection("refresh_tokens").insertOne(tokenDoc as any);
+
+  const isSecure = getRequestURL(event).protocol === "https:";
 
   setCookie(event, "refresh_token", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     expires: expiresAt,
   });

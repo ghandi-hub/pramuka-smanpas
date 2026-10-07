@@ -3,10 +3,14 @@ import type { Profiles } from "~/services/userService";
 export const useAdminAuth = () => {
   const profile = useState<Profiles | null>("admin-profile", () => null);
   const loading = useState<boolean>("admin-profile-loading", () => false);
+  const isSecure = import.meta.client
+    ? window.location.protocol === "https:"
+    : false;
+
   const token = useCookie("auth_token", {
     maxAge: 60 * 60 * 24 * 7, // 7 days
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     path: "/",
   });
 

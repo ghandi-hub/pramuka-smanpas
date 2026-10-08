@@ -22,7 +22,6 @@ export default defineEventHandler(async (event) => {
     const decoded = verifyToken(token) as any;
     const db = await getDb();
 
-    // Fetch profile
     const profile = await db
       .collection("profiles")
       .findOne(toMongoIdFilter(String(decoded.id)));

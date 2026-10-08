@@ -25,7 +25,6 @@ export default defineEventHandler(async (event) => {
   const db = await getDb();
   const normalizedEmail = String(email).toLowerCase().trim();
 
-  // 1. Find user
   const user = await db
     .collection("users")
     .findOne({ email: normalizedEmail });
@@ -37,7 +36,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 2. Verify password
   const isMatch = await comparePassword(password, user.password_hash);
   if (!isMatch) {
     throw createError({
@@ -46,7 +44,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 3. Reject if not verified
+  // Reject unverified users
   if (!user.email_verified) {
     throw createError({
       statusCode: 403,
@@ -54,7 +52,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 4. Load profile role
   const userId = String(user.id || user._id);
   const profile = await db
     .collection("profiles")
@@ -67,7 +64,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 5. Generate Access Token (short-lived)
+  // Short-lived access token
   const accessToken = signToken(
     {
       id: userId,
@@ -76,7 +73,7 @@ export default defineEventHandler(async (event) => {
     "1h",
   );
 
-  // 6. Generate Refresh Token (long-lived)
+  // Long-lived refresh token
   const refreshToken = generateRandomToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 

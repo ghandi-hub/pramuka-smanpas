@@ -36,7 +36,6 @@ const toggleDark = () => {
     localStorage.setItem('admin-theme', isDark.value ? 'dark' : 'light')
 }
 
-// Initialize theme from localStorage
 onMounted(() => {
     const saved = localStorage.getItem('admin-theme')
     if (saved === 'dark') {

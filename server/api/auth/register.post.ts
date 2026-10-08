@@ -10,7 +10,6 @@ export default defineEventHandler(async (event) => {
   const { name, email, password, role, avatar_url, religion } = body;
   const config = useRuntimeConfig();
 
-  // 1. Validate
   if (!name || !email || !password) {
     throw createError({
       statusCode: 400,
@@ -18,7 +17,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // --- Authorization Check ---
+  // Authorization check: only admin can register new users
   const authHeader = getHeader(event, "Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw createError({
@@ -50,7 +49,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Token tidak valid",
     });
   }
-  // ---------------------------
 
   const db = await getDb();
   const normalizedEmail = String(email).toLowerCase().trim();
@@ -70,13 +68,11 @@ export default defineEventHandler(async (event) => {
   let createdUserId: string | null = null;
 
   try {
-    // 2. Hash password
     const passwordHash = await hashPassword(password);
     const userId = randomUUID();
     createdUserId = userId;
     const now = new Date().toISOString();
 
-    // 3. Insert into users
     const userDoc = {
       id: userId,
       _id: userId,
@@ -88,7 +84,6 @@ export default defineEventHandler(async (event) => {
     };
     await db.collection("users").insertOne(userDoc);
 
-    // 4. Insert into profiles (using same ID)
     const profileDoc = {
       id: userId,
       _id: userId,
@@ -102,11 +97,9 @@ export default defineEventHandler(async (event) => {
     };
     await db.collection("profiles").insertOne(profileDoc as any);
 
-    // 5. Generate verification token
     const verificationToken = generateRandomToken();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-    // 6. Store token
     const verificationDoc = prepareDocumentForInsert({
       user_id: userId,
       token: verificationToken,
@@ -114,7 +107,6 @@ export default defineEventHandler(async (event) => {
     });
     await db.collection("email_verifications").insertOne(verificationDoc);
 
-    // 7. Send verification email
     const verificationLink = `${config.public.siteUrl}/auth/verify-email?token=${verificationToken}`;
     const html = `
           <h1>Verifikasi Email Anda</h1>

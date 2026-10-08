@@ -56,7 +56,7 @@
     "motto": {
       "title": "Praja Aditya",
       "title_2": "Mahatva Yoddha",
-      "description": "\"Pejuang agung yang bersinar seperti matahari bagi rakyat\"—itulah semangat yang kami hidupkan di setiap langkah Gerakan Pramuka. Kami membentuk generasi yang tangguh, berkarakter, dan siap mengabdi, dengan jiwa kepemimpinan, kebersamaan, serta kepedulian terhadap sesama dan lingkungan. Bersama, kita tumbuh menjadi pribadi yang memberi cahaya dan manfaat bagi masyarakat."
+      "description": "\"Pejuang agung yang bersinar seperti matahari bagi rakyat\", itulah semangat yang kami hidupkan di setiap langkah Gerakan Pramuka. Kami membentuk generasi yang tangguh, berkarakter, dan siap mengabdi, dengan jiwa kepemimpinan, kebersamaan, serta kepedulian terhadap sesama dan lingkungan. Bersama, kita tumbuh menjadi pribadi yang memberi cahaya dan manfaat bagi masyarakat."
     },
     "activities": {
       "latest_expedition": "Ekspedisi Terbaru",
@@ -243,11 +243,11 @@
     },
     "fields": {
       "all": "Semua Bidang",
-      "kuning": "Kuning — Agama & Moral",
-      "merah": "Merah — Patriotisme & Seni",
-      "putih": "Putih — Kesehatan & Ketangkasan",
-      "hijau": "Hijau — Keterampilan & Pembangunan",
-      "biru": "Biru — Sosial & Kemanusiaan"
+      "kuning": "Kuning: Agama & Moral",
+      "merah": "Merah: Patriotisme & Seni",
+      "putih": "Putih: Kesehatan & Ketangkasan",
+      "hijau": "Hijau: Keterampilan & Pembangunan",
+      "biru": "Biru: Sosial & Kemanusiaan"
     },
     "fields_badge": {
       "kuning": "Kuning / Agama",

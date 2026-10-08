@@ -25,7 +25,6 @@ export default defineEventHandler(async (event) => {
   const db = await getDb();
   const normalizedEmail = String(email).toLowerCase().trim();
 
-  // 1. Find user
   const user = await db
     .collection("users")
     .findOne({ email: normalizedEmail });
@@ -39,10 +38,9 @@ export default defineEventHandler(async (event) => {
 
   const userId = String(user.id || user._id);
 
-  // 2. Delete old tokens
+  // Invalidate previous tokens
   await db.collection("password_resets").deleteMany({ user_id: userId });
 
-  // 3. Generate reset token
   const token = generateRandomToken();
   const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
 
@@ -53,7 +51,6 @@ export default defineEventHandler(async (event) => {
   });
   await db.collection("password_resets").insertOne(resetDoc);
 
-  // 4. Send email
   const resetLink = `${config.public.siteUrl}/auth/reset-password?token=${token}`;
   const html = `
         <h1>Reset Password</h1>

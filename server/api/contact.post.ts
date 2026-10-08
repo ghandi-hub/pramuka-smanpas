@@ -2,7 +2,7 @@ import { getDb, prepareDocumentForInsert } from "~~/server/utils/mongo";
 import { sendMail } from "~~/server/utils/mailer";
 import { checkRateLimit } from "~~/server/utils/rateLimit";
 
-// Minimum time (ms) the form should take to fill — bots submit instantly
+// Waktu minimum (ms) pengisian form: cegah bot instan
 const MIN_FORM_TIME = 3000; // 3 seconds
 
 function sanitize(input: string): string {
@@ -20,7 +20,6 @@ function isValidEmail(email: string): boolean {
 const VALID_SUBJECTS = ["join", "collab", "general"];
 
 export default defineEventHandler(async (event) => {
-  // --- Rate Limiting ---
   checkRateLimit(event, {
     key: "contact",
     windowMs: 15 * 60 * 1000,
@@ -28,30 +27,27 @@ export default defineEventHandler(async (event) => {
     message: "Terlalu banyak pengiriman pesan. Silakan coba lagi dalam 15 menit.",
   });
 
-  // --- Read Body ---
   const body = await readBody(event);
 
-  // --- Honeypot Check ---
-  // If the hidden "website" field is filled, it's a bot
+  // Honeypot check: If hidden "website" field is filled, it's a bot
   if (body.website) {
-    // Silently accept but don't save — don't reveal to bot that it failed
+    // Terima tanpa simpan agar bot tidak mendeteksi kegagalan
     return { success: true };
   }
 
-  // --- Timing Check ---
+  // Timing check
   const formLoadedAt = body._formLoadedAt;
   if (formLoadedAt) {
     const elapsed = Date.now() - Number(formLoadedAt);
     if (elapsed < MIN_FORM_TIME) {
-      // Submitted too fast — likely a bot
+      // Dikirim terlalu cepat: terindikasi bot
       return { success: true };
     }
   } else {
-    // Missing timestamp — suspicious
+    // Timestamp hilang: mencurigakan
     return { success: true };
   }
 
-  // --- Input Validation ---
   const { full_name, email, subject, message } = body;
 
   if (
@@ -93,7 +89,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // --- Spam content heuristics ---
+  // Spam content heuristics
   const spamPatterns = [
     /\b(viagra|casino|lottery|crypto|bitcoin|click here|buy now|free money)\b/i,
     /(http[s]?:\/\/[^\s]+){3,}/i, // 3+ URLs in message
@@ -107,7 +103,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // --- Save to MongoDB ---
   const db = await getDb();
   const contactDoc = prepareDocumentForInsert({
     full_name: sanitize(full_name),
@@ -127,7 +122,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // --- Send email notification ---
   const config = useRuntimeConfig();
   const targetEmail = config.emailUser;
 

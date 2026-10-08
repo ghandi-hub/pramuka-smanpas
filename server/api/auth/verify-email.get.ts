@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
   const db = await getDb();
   const verificationsCollection = db.collection("email_verifications");
 
-  // 1. Find token
   const verification = await verificationsCollection.findOne({
     token: String(token),
   });
@@ -28,7 +27,7 @@ export default defineEventHandler(async (event) => {
 
   const verificationId = String(verification.id || verification._id);
 
-  // 2. Validate expiration
+  // Validate expiration
   if (!verification.expires_at || new Date(verification.expires_at) < new Date()) {
     await verificationsCollection.deleteOne(toMongoIdFilter(verificationId));
     throw createError({
@@ -37,7 +36,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 3. Update user
   const userFilter = toMongoIdFilter(String(verification.user_id));
   const updateResult = await db.collection("users").updateOne(userFilter, {
     $set: {
@@ -53,7 +51,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 4. Delete token
   await verificationsCollection.deleteOne(toMongoIdFilter(verificationId));
 
   return {

@@ -16,16 +16,14 @@ useSeoMeta({
   twitterImage: `${siteUrl}/images/logo.webp`,
 })
 
-// --- Anti-spam: track when form was loaded ---
 const formLoadedAt = ref(Date.now())
 
-// --- Form state ---
 const form = reactive({
   full_name: '',
   email: '',
   subject: 'join',
   message: '',
-  website: '', // Honeypot — must stay empty
+  website: '', // Honeypot (harus tetap kosong)
 })
 
 const submitting = ref(false)
@@ -33,7 +31,6 @@ const submitted = ref(false)
 const errorMessage = ref('')
 const cooldownRemaining = ref(0)
 
-// --- Cooldown: prevent rapid re-submissions ---
 const COOLDOWN_SECONDS = 60
 let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
@@ -48,7 +45,6 @@ function startCooldown() {
   }, 1000)
 }
 
-// --- Client-side validation ---
 function validate(): string | null {
   if (!form.full_name.trim() || form.full_name.trim().length < 2) {
     return 'Nama lengkap wajib diisi (minimal 2 karakter).'
@@ -68,7 +64,6 @@ function validate(): string | null {
   return null
 }
 
-// --- Submit handler ---
 async function handleSubmit() {
   errorMessage.value = ''
 
@@ -103,7 +98,6 @@ async function handleSubmit() {
     submitted.value = true
     startCooldown()
 
-    // Reset form
     form.full_name = ''
     form.email = ''
     form.subject = 'join'
@@ -214,7 +208,7 @@ onUnmounted(() => {
 
           <!-- Form -->
           <form v-else class="space-y-6" @submit.prevent="handleSubmit" novalidate>
-            <!-- Honeypot field — invisible to real users, bots will fill it -->
+            <!-- Honeypot field: tidak terlihat bagi pengguna asli, bot akan mengisinya -->
             <div aria-hidden="true"
               style="position: absolute; left: -9999px; top: -9999px; opacity: 0; height: 0; width: 0; overflow: hidden; pointer-events: none;"
               tabindex="-1">

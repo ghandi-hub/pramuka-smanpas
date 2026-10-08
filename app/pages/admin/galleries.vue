@@ -112,7 +112,7 @@ const generateInitialPosition = (existing: GalleryItem[], canvasWidth = 8000, ca
         if (!isTooClose) return { x, y }
     }
 
-    // Phase 3: Grid scan as last resort — guaranteed non-overlapping
+    // Phase 3: Grid scan fallback: jaminan tidak tumpang tindih
     const step = minDistance
     for (let gy = step; gy < canvasHeight - step; gy += step) {
         for (let gx = step; gx < canvasWidth - step; gx += step) {
@@ -125,7 +125,7 @@ const generateInitialPosition = (existing: GalleryItem[], canvasWidth = 8000, ca
         }
     }
 
-    // Canvas truly full — offset from center
+    // Canvas penuh: offset dari titik tengah
     return {
         x: centerX + existing.length * minDistance * 0.3,
         y: centerY

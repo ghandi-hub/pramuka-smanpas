@@ -200,29 +200,8 @@ onMounted(() => {
       </p>
     </div>
 
-    <!-- ✅ Tombol kontrol zoom -->
+    <!-- Tombol kontrol zoom -->
     <div class="absolute top-4 right-4 z-40 flex flex-col gap-2">
-      <!-- <button ref="zoomIn"
-        class="w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow-md flex items-center justify-center text-gray-700 hover:text-gray-900 transition backdrop-blur-sm border border-gray-200"
-        :title="$t('home.pinboard.zoom_in')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-      </button>
-
-      <button ref="zoomOut"
-        class="w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow-md flex items-center justify-center text-gray-700 hover:text-gray-900 transition backdrop-blur-sm border border-gray-200"
-        :title="$t('home.pinboard.zoom_out')">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 12h16" />
-        </svg>
-      </button> -->
-
-      <!-- Divider -->
-      <!-- <div class="w-full h-px bg-gray-200 mx-auto" /> -->
-
       <button
         ref="resetView"
         class="w-10 h-10 rounded-lg bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-gray-700 hover:text-gray-900 transition-all duration-200 backdrop-blur-sm border border-gray-200 hover:scale-105"

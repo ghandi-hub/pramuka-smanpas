@@ -31,7 +31,7 @@ onMounted(() => {
   <div class="flex flex-col min-h-screen">
     <!-- Hero Section -->
     <section class="relative w-full min-h-[90vh] flex items-center bg-card overflow-hidden">
-      <!-- Decorative background — lightweight gradients instead of blur -->
+      <!-- Decorative background: lightweight gradients instead of blur -->
       <div class="absolute inset-0 z-0">
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full opacity-60"></div>
         <div class="absolute top-1/2 -left-24 w-72 h-72 bg-accent/10 rounded-full opacity-60"></div>

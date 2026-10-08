@@ -123,7 +123,7 @@ export default defineEventHandler(async (event) => {
     if (remaining >= 3) {
       throw createError({
         statusCode: 400,
-        statusMessage: `Tingkat Laksana masih terkunci. Selesaikan butir Bantara terlebih dahulu — maksimal 2 butir Bantara boleh belum lulus, saat ini ${remaining} butir belum lulus.`,
+        statusMessage: `Tingkat Laksana masih terkunci. Selesaikan butir Bantara terlebih dahulu (maksimal 2 butir Bantara boleh belum lulus, saat ini ${remaining} butir belum lulus).`,
       });
     }
   }

@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
   const db = await getDb();
   const resetsCollection = db.collection("password_resets");
 
-  // 1. Find token
   const reset = await resetsCollection.findOne({ token: String(token) });
 
   if (!reset) {
@@ -27,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   const resetId = String(reset.id || reset._id);
 
-  // 2. Validate expiration
+  // Validate expiration
   if (!reset.expires_at || new Date(reset.expires_at) < new Date()) {
     await resetsCollection.deleteOne(toMongoIdFilter(resetId));
     throw createError({
@@ -36,10 +35,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 3. Hash new password
   const passwordHash = await hashPassword(password);
 
-  // 4. Update user
   const userFilter = toMongoIdFilter(String(reset.user_id));
   const updateResult = await db.collection("users").updateOne(userFilter, {
     $set: {
@@ -55,7 +52,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 5. Delete token
   await resetsCollection.deleteOne(toMongoIdFilter(resetId));
 
   return {

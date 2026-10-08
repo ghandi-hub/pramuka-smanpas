@@ -96,7 +96,6 @@ function onDrag(e: MouseEvent | TouchEvent) {
   if (!isDragging.value) return;
 
   if ("touches" in e) {
-    // Handle pinch to zoom
     if (e.touches.length === 2 && initialPinchDistance > 0) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
@@ -111,7 +110,6 @@ function onDrag(e: MouseEvent | TouchEvent) {
       }
     }
 
-    // Handle single touch pan
     const touch = e.touches[0];
     if (touch) {
       const dx = touch.clientX - startX;
@@ -150,20 +148,16 @@ function uploadImage(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (!file) return;
 
-  // Revoke the old URL to free up memory if it exists
+  // Revoke old URL if exists
   if (userImage.value && userImage.value.startsWith("blob:")) {
     URL.revokeObjectURL(userImage.value);
   }
 
-  // Create a new blob URL instead of base64 for better performance
   userImage.value = URL.createObjectURL(file);
-  
-  // Reset position when new image is uploaded
   imagePosition.value = { x: 0, y: 0 };
   imageScale.value = 1;
 }
 
-// Cleanup object URL when component is destroyed
 onUnmounted(() => {
   if (userImage.value && userImage.value.startsWith("blob:")) {
     URL.revokeObjectURL(userImage.value);
@@ -227,7 +221,6 @@ function downloadImage() {
       ctx.drawImage(img, x, y, drawWidth, drawHeight);
       ctx.drawImage(frame, 0, 0, canvasWidth, canvasHeight);
 
-      // Download
       const link = document.createElement("a");
       link.download = `twibbon-${props.title}.png`;
       link.href = canvas.toDataURL("image/png");

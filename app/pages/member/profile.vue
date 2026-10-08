@@ -35,7 +35,6 @@ useHead({
 const { t } = useI18n();
 const { profile, updateProfile, changePassword } = useAdminAuth();
 
-// --- Profile Edit State ---
 const profileForm = ref({
   name: "",
   religion: "islam",
@@ -95,7 +94,6 @@ const handleProfileSubmit = async () => {
   }
 };
 
-// --- Password Change State ---
 const passwordForm = ref({
   old_password: "",
   new_password: "",

@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
   let userEmail = email ? String(email).toLowerCase().trim() : null;
   let userId: string | null = null;
 
-  // 1. Find user via old token if provided
   if (oldToken) {
     const verification = await db
       .collection("email_verifications")
@@ -33,7 +32,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Find user via email if user not found yet
   if (!userId && userEmail) {
     const user = await db
       .collection("users")
@@ -52,16 +50,13 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  // 2. Check if already verified
   const userData = await db.collection("users").findOne(toMongoIdFilter(userId));
   if (userData?.email_verified) {
     return { message: "Email sudah diverifikasi." };
   }
 
-  // 3. Delete old tokens
   await db.collection("email_verifications").deleteMany({ user_id: userId });
 
-  // 4. Generate new token
   const newToken = generateRandomToken();
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
@@ -72,7 +67,6 @@ export default defineEventHandler(async (event) => {
   });
   await db.collection("email_verifications").insertOne(verificationDoc);
 
-  // 5. Send email
   const verificationLink = `${config.public.siteUrl}/auth/verify-email?token=${newToken}`;
   const html = `
         <h1>Verifikasi Email Anda</h1>

@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
   const db = await getDb();
   const tokensCollection = db.collection("refresh_tokens");
 
-  // 1. Check token in database
   const tokenData = await tokensCollection.findOne({ token: refreshToken });
 
   if (!tokenData) {
@@ -25,7 +24,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 2. Check expiration
+  // Check expiration
   if (!tokenData.expires_at || new Date(tokenData.expires_at) < new Date()) {
     await tokensCollection.deleteOne({ token: refreshToken });
     throw createError({
@@ -34,7 +33,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 3. Get user profile for payload
   const userId = String(tokenData.user_id);
   const profile = await db
     .collection("profiles")
@@ -47,7 +45,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 4. Issue new access token
+  // Issue new access token
   const accessToken = signToken(
     {
       id: userId,
@@ -56,7 +54,7 @@ export default defineEventHandler(async (event) => {
     "1h",
   );
 
-  // 5. Rotate refresh token: invalidate old and generate new
+  // Rotate refresh token
   const newRefreshToken = generateRandomToken();
   const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 

@@ -25,7 +25,6 @@ useHead({
 
 const { profile, updateProfile, changePassword } = useAdminAuth();
 
-// --- Profile Edit State ---
 const profileForm = ref({
   name: "",
   email: "",
@@ -37,7 +36,6 @@ const uploading = ref(false);
 const selectedFile = ref<File | null>(null);
 const { uploadImage, deleteImage } = useImageService();
 
-// Initialize form when profile loads
 watch(
   profile,
   (newVal) => {
@@ -85,7 +83,6 @@ const handleProfileSubmit = async () => {
   }
 };
 
-// --- Password Change State ---
 const passwordForm = ref({
   old_password: "",
   new_password: "",

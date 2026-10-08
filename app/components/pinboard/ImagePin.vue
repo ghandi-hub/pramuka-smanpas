@@ -11,7 +11,7 @@ const props = defineProps({
 // Definisikan emit agar bisa didengar oleh parent
 const emit = defineEmits(['open-detail'])
 
-// ✅ Deteksi apakah device touch/mobile
+// Deteksi perangkat layar sentuh/mobile
 const isTouchDevice = () => {
   return window.matchMedia('(pointer: coarse)').matches
 }

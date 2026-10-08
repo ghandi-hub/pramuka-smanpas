@@ -1,4 +1,4 @@
-import useSupabaseCrud from "~/composables/useSupabaseCrud";
+import useMongoCrud from "~/composables/useMongoCrud";
 
 export interface ContactMessage {
   id: string;
@@ -11,7 +11,7 @@ export interface ContactMessage {
 }
 
 export function useContactMessageService() {
-  const crud = useSupabaseCrud<ContactMessage>("contact_messages");
+  const crud = useMongoCrud<ContactMessage>("contact_messages");
 
   const markAsRead = async (id: string) => {
     return await crud.update(id, { status: "read" });

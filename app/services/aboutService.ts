@@ -1,4 +1,4 @@
-import useSupabaseCrud from "~/composables/useSupabaseCrud"
+import useMongoCrud from "~/composables/useMongoCrud"
 
 export interface About {
     id: string
@@ -11,7 +11,7 @@ export interface About {
 }
 
 export function useAboutService() {
-    const crud = useSupabaseCrud<About>('abouts')
+    const crud = useMongoCrud<About>('abouts')
 
     return {
         ...crud,

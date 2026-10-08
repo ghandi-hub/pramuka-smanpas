@@ -139,7 +139,7 @@ const onDrop = async (index: number) => {
     dragIndex.value = null
     dropIndex.value = null
 
-    // Save to Supabase
+    // Save to MongoDB
     try {
         await reorder(items.map((item, i) => ({ id: item.id, order_number: i })))
         toast.success('Urutan berhasil diperbarui')

@@ -1,4 +1,4 @@
-import useSupabaseCrud from "~/composables/useSupabaseCrud";
+import useMongoCrud from "~/composables/useMongoCrud";
 import { useImageService } from "./imageService";
 
 export interface OrganizationMember {
@@ -10,7 +10,7 @@ export interface OrganizationMember {
 }
 
 export function useMemberService() {
-  const crud = useSupabaseCrud<OrganizationMember>("organization_members");
+  const crud = useMongoCrud<OrganizationMember>("organization_members");
   const { uploadImage, deleteImage } = useImageService();
 
   const fetchAllOrdered = async () => {

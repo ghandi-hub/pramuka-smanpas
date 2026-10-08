@@ -1,4 +1,4 @@
-import useSupabaseCrud from "~/composables/useSupabaseCrud";
+import useMongoCrud from "~/composables/useMongoCrud";
 import { useImageService } from "./imageService";
 
 export interface TwibbonCampaign {
@@ -12,7 +12,7 @@ export interface TwibbonCampaign {
 }
 
 export function useTwibbonCampaignService() {
-  const crud = useSupabaseCrud<TwibbonCampaign>("twibbon_campaigns");
+  const crud = useMongoCrud<TwibbonCampaign>("twibbon_campaigns");
   const { uploadImage, deleteImage } = useImageService();
 
     const removeCampaign = async (id: string, frameUrl?: string | null) => {

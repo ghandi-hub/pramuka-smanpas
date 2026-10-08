@@ -1,3 +1,4 @@
+// Skrip migrasi sekali pakai (one-time migration) dari Supabase ke MongoDB
 import { MongoClient } from "mongodb";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "";

@@ -1,4 +1,4 @@
-import useSupabaseCrud from '~/composables/useSupabaseCrud'
+import useMongoCrud from '~/composables/useMongoCrud'
 import { useImageService } from './imageService'
 
 export interface Activity {
@@ -12,7 +12,7 @@ export interface Activity {
 }
 
 export function useActivityService() {
-    const crud = useSupabaseCrud<Activity>('activities')
+    const crud = useMongoCrud<Activity>('activities')
     const { uploadImage, deleteImage } = useImageService()
 
     const removeActivity = async (id: string, imageUrl?: string | null) => {

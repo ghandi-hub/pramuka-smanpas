@@ -1,4 +1,4 @@
-import useSupabaseCrud from "~/composables/useSupabaseCrud";
+import useMongoCrud from "~/composables/useMongoCrud";
 import { useImageService } from "./imageService";
 
 export interface GalleryItem {
@@ -13,7 +13,7 @@ export interface GalleryItem {
 }
 
 export function useGalleryService() {
-  const crud = useSupabaseCrud<GalleryItem>("galleries");
+  const crud = useMongoCrud<GalleryItem>("galleries");
   const { uploadImage, deleteImage } = useImageService();
 
   const updatePosition = async (id: string, x: number, y: number) => {

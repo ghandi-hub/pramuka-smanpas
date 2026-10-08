@@ -1,26 +1,59 @@
 import { useImageService } from "~/services/imageService";
+import { decodeJwtPayload, isTokenValid } from "~/utils/jwtHelper";
 
-export default function useSupabaseCrud<T extends Record<string, any>>(
-  tableName: string,
+const PUBLIC_COLLECTIONS = new Set([
+  "activities",
+  "galleries",
+  "organization_members",
+  "abouts",
+  "twibbon_campaigns",
+]);
+
+export function useMongoCrud<T extends Record<string, any>>(
+  collectionName: string,
 ) {
-  const { token } = useAdminAuth();
+  const { token, profile } = useAdminAuth();
   const { deleteImage } = useImageService();
 
   const data = ref<T[]>([]) as Ref<T[]>;
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  // Helper to check if we should use the admin endpoint
-  const useProxy = () => !!token.value;
+  const isAdmin = () => {
+    if (profile.value?.role === "admin") return true;
+    if (!token.value || !isTokenValid(token.value)) return false;
+    const payload = decodeJwtPayload(token.value);
+    return payload?.role === "admin";
+  };
+
+  const isPublicCollection = PUBLIC_COLLECTIONS.has(collectionName);
+
+  const onAdminRoute = () => {
+    try {
+      const route = useRoute();
+      return /(?:^|\/)admin(?:\/|$)/.test(route?.path || "");
+    } catch {
+      return false;
+    }
+  };
 
   const getBaseEndpoint = () => {
-    return useProxy()
-      ? `/api/admin/db/${tableName}`
-      : `/api/public/db/${tableName}`;
+    // If it's a public collection, use the public endpoint unless
+    // an authenticated admin is managing data inside the admin CMS routes.
+    if (isPublicCollection) {
+      if (isAdmin() && onAdminRoute()) {
+        return `/api/admin/db/${collectionName}`;
+      }
+      return `/api/public/db/${collectionName}`;
+    }
+
+    // For non-public collections (e.g. contact_messages, profiles), route to admin endpoint
+    return `/api/admin/db/${collectionName}`;
   };
 
   const getAuthHeaders = (): Record<string, string> => {
-    if (useProxy() && token.value) {
+    const endpoint = getBaseEndpoint();
+    if (endpoint.startsWith("/api/admin") && token.value) {
       return { Authorization: `Bearer ${token.value}` };
     }
     return {};
@@ -126,7 +159,7 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
   };
 
   const insert = async (item: Partial<T>): Promise<T> => {
-    if (!useProxy()) {
+    if (!isAdmin()) {
       throw new Error("Unauthorized: Only admins can perform this action");
     }
 
@@ -134,7 +167,7 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
     error.value = null;
 
     try {
-      const result = await $fetch<T>(`/api/admin/db/${tableName}`, {
+      const result = await $fetch<T>(`/api/admin/db/${collectionName}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token.value}` },
         body: item,
@@ -154,7 +187,7 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
     payload: Partial<T>,
     oldImageUrl?: string | null,
   ): Promise<T | undefined> => {
-    if (!useProxy()) {
+    if (!isAdmin()) {
       throw new Error("Unauthorized: Only admins can perform this action");
     }
 
@@ -162,7 +195,7 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
     error.value = null;
 
     try {
-      const result = await $fetch<T>(`/api/admin/db/${tableName}/${id}`, {
+      const result = await $fetch<T>(`/api/admin/db/${collectionName}/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token.value}` },
         body: payload,
@@ -194,7 +227,7 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
   };
 
   const remove = async (id: string, imageUrl?: string | null): Promise<void> => {
-    if (!useProxy()) {
+    if (!isAdmin()) {
       throw new Error("Unauthorized: Only admins can perform this action");
     }
 
@@ -206,7 +239,7 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
         await deleteImage(imageUrl);
       }
 
-      await $fetch(`/api/admin/db/${tableName}/${id}`, {
+      await $fetch(`/api/admin/db/${collectionName}/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token.value}` },
       });
@@ -231,3 +264,5 @@ export default function useSupabaseCrud<T extends Record<string, any>>(
     remove,
   };
 }
+
+export default useMongoCrud;

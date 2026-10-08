@@ -6,7 +6,7 @@ Website Landing Page and Admin CMS (Content Management System) Dashboard for the
 
 - **Public Landing Page**: Fast, SEO-optimized, and server-side rendered website for public viewing.
 - **Admin CMS Dashboard**: Comprehensive content management system for managing members, gallery, and activities.
-- **Secure Authentication**: Built-in authentication powered by Supabase Auth with protected admin routes.
+- **Secure Authentication**: Built-in authentication powered by custom JWT & Refresh Tokens with protected admin and member routes.
 - **Interactive UI**: Fluid user experience with features like image pan-and-zoom, toast notifications, and advanced data tables.
 - **Bilingual Support**: Internationalization (i18n) supporting both Indonesian (ID) and English (EN).
 - **Modern Styling**: Fully responsive, accessible, and easily customizable design system.
@@ -33,8 +33,8 @@ Website Landing Page and Admin CMS (Content Management System) Dashboard for the
 Ensure you have the following installed before setting up the project:
 
 - Bun 1.0 or higher
-- A Supabase Project (for PostgreSQL database, Auth, and Storage)
-- (Optional) Cloudinary account for external image hosting
+- A MongoDB instance (e.g. MongoDB Atlas or local MongoDB)
+- MinIO or S3 compatible Object Storage (for image hosting)
 
 ---
 
@@ -57,7 +57,7 @@ bun install
 
 ### 3. Environment Setup
 
-Create a `.env` file in the root directory based on the environment variables needed by Nuxt and Supabase:
+Create a `.env` file in the root directory based on the environment variables needed by Nuxt and MongoDB:
 
 ```bash
 touch .env
@@ -113,14 +113,14 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. **Client Request**: A user visits a URL. The Nuxt router resolves the corresponding page component in `app/pages/`.
 2. **Server-Side Rendering (SSR)**: For initial page loads or server-rendered pages, Nuxt executes `useAsyncData` or `useFetch` to gather required data before sending the HTML to the browser.
-3. **API Processing**: If the frontend requests a `/api/...` endpoint, the Nitro server (`server/api/`) processes the business logic (e.g., validating JWT, fetching from Supabase), and returns JSON.
-4. **Database Interaction**: The Nitro server or Supabase SDK interacts with the PostgreSQL database.
+3. **API Processing**: If the frontend requests a `/api/...` endpoint, the Nitro server (`server/api/`) processes the business logic (e.g., validating JWT, querying MongoDB), and returns JSON.
+4. **Database Interaction**: The Nitro server interacts with the MongoDB database.
 5. **Client Hydration**: Once the browser receives the HTML, Vue takes over and the page becomes interactive (SPA navigation for subsequent clicks).
 
 ### Data Flow
 
 ```
-User Action → Vue Component → Nuxt Server Route / Supabase SDK → PostgreSQL Database
+User Action → Vue Component → Nuxt Server Route → MongoDB Database
      ↓
 Vue Reactive State ← API Response ←
 ```
@@ -128,11 +128,11 @@ Vue Reactive State ← API Response ←
 ### Key Components
 
 **Authentication**
-- Supabase Auth manages user sessions and JWT tokens.
+- Custom JWT & Refresh Tokens manage user sessions and authentication.
 - Nuxt route middleware (`app/middleware/`) checks session validity before allowing access to `/admin` routes.
 
 **Database & Backend**
-- Supabase provides a fully managed PostgreSQL database.
+- MongoDB provides NoSQL document database storage.
 - Nitro server API routes handle sensitive operations like email sending (via Nodemailer) or secure profile updates, hiding credentials from the frontend.
 
 **UI System**

@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import useSupabaseCrud from '~/composables/useSupabaseCrud'
+import useMongoCrud from '~/composables/useMongoCrud'
 
 definePageMeta({ layout: 'admin',middleware:'admin' })
 useHead({ title: 'Dashboard Admin', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
@@ -29,10 +29,10 @@ onMounted(async () => {
     }
 
     try {
-        const activityCrud = useSupabaseCrud('activities')
-        const galleryCrud = useSupabaseCrud('galleries')
-        const memberCrud = useSupabaseCrud('organization_members')
-        const messageCrud = useSupabaseCrud('contact_messages')
+        const activityCrud = useMongoCrud('activities')
+        const galleryCrud = useMongoCrud('galleries')
+        const memberCrud = useMongoCrud('organization_members')
+        const messageCrud = useMongoCrud('contact_messages')
 
         const [a, b, c, d] = await Promise.all([
             activityCrud.fetchCount(),

@@ -1,4 +1,4 @@
-import useSupabaseCrud from "~/composables/useSupabaseCrud";
+import useMongoCrud from "~/composables/useMongoCrud";
 import { useImageService } from "./imageService";
 
 export interface Profiles {
@@ -12,7 +12,7 @@ export interface Profiles {
 }
 
 export function useUserService() {
-  const crud = useSupabaseCrud<Profiles>("profiles");
+  const crud = useMongoCrud<Profiles>("profiles");
   const { data, loading } = crud;
   const { uploadImage, deleteImage } = useImageService();
 

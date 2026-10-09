@@ -46,31 +46,32 @@ interface SkkItem {
 
 const now = new Date().toISOString();
 
-// FULL 23 BUTIR PENEGAK BANTARA (SK KWARNAS 198/2011)
+// FULL 23 BUTIR PENEGAK BANTARA (SK KWARNAS NO. 199 TAHUN 2011)
 const bantaraItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
   {
     level: "bantara",
     point_number: 1,
     category: "Spiritual/Agama",
     title: "Memahami dan Mengamalkan Ajaran Agama",
-    description: "Dapat menjelaskan makna Rukun Iman dan Rukun Islam bagi umat Islam, atau tata peribadatan dan ajaran keagamaan sesuai agama yang dianutnya (Katolik, Kristen Protestan, Hindu, Buddha).",
+    description: "Dapat menjelaskan makna Rukun Iman dan Rukun Islam bagi umat Islam, atau tata peribadatan dan ajaran keagamaan sesuai keyakinannya (Katolik, Kristen Protestan, Hindu, Buddha).",
     sub_points: [
-      "Islam: Dapat menjelaskan rukun iman dan rukun islam, mampu menjelaskan rukun shalat dan mendirikan shalat berjamaah, menjelaskan rukun dan hikmah puasa, serta hafal 5 doa harian dan 3 surat pendek juz 'amma.",
-      "Katolik: Memahami makna Sakramen Baptis dan Ekaristi, rajin mengikuti misa mingguan, dan mampu berdoa Bapa Kami serta Salam Maria.",
-      "Kristen Protestan: Rajin beribadah di gereja, memahami Hukum Kasih dan Sepuluh Hukum Taurat, serta berdoa secara teratur.",
-      "Hindu: Memahami Panca Sradha, Tri Hita Karana, dan rutin melaksanakan Tri Sandhya.",
-      "Buddha: Memahami Triratna, Empat Kesunyataan Mulia, dan Delapan Jalan Utama."
+      "Islam: Menjelaskan makna Rukun Iman & Islam, makna sholat berjamaah & mendirikan sholat sunah, makna & macam puasa, tata cara pengurusan jenazah (Tajhizul Jenazah), doa ijab qobul zakat, serta hafalan & penjelasan hadist.",
+      "Katolik: Memahami makna dan arti Gereja Katolik, serta memimpin doa dan membuat gerakan cinta kasih pada keberagaman di luar Gereja Katolik.",
+      "Kristen Protestan: Mendalami Hukum Kasih dan mengamalkannya dalam kehidupan sehari-hari.",
+      "Hindu: Menjelaskan sejarah Hindu di Indonesia, hakikat persembahyangan, maksud kelahiran manusia, Tri Hita Karana, Asanas Hatta Yoga, melafalkan Dharma Gita, dan pura Sad Kahyangan.",
+      "Buddha: Saddha Buddha Dharma, merumuskan keyakinan, sejarah Buddha Gotama, Tiratana, dan sejarah penulisan Tripitaka."
     ]
   },
   {
     level: "bantara",
     point_number: 2,
     category: "Sosial & Emosional",
-    title: "Menyampaikan Kritik dan Saran Secara Sopan",
-    description: "Berani menyampaikan kritik dan saran dengan sopan dan santun kepada sesama teman ambalan demi perbaikan bersama.",
+    title: "Berani Menyampaikan Kritik dan Saran Santun",
+    description: "Berani menyampaikan kritik dan saran dengan sopan dan santun kepada sesama teman.",
     sub_points: [
-      "Menggunakan tutur kata yang santun tanpa merendahkan martabat orang lain.",
-      "Menyampaikan masukan konstruktif yang berlandaskan data atau fakta yang objektif."
+      "Berani mengemukakan saran dengan sopan dan santun tanpa menyinggung perasaan teman.",
+      "Dapat mengungkapkan alasan dan memilih kata-kata yang konstruktif.",
+      "Tahu waktu yang tepat untuk menyampaikan kritikan dan mampu membaca perasaan teman."
     ]
   },
   {
@@ -78,43 +79,41 @@ const bantaraItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
     point_number: 3,
     category: "Sosial & Emosional",
     title: "Mengikuti Jalannya Diskusi dengan Baik",
-    description: "Dapat mengikuti jalannya diskusi dengan baik, menghargai pandangan yang berbeda, dan tidak memaksakan kehendak pribadi.",
+    description: "Dapat mengikuti jalannya diskusi dengan baik.",
     sub_points: [
-      "Aktif menyampaikan pendapat secara tertib dan mendengarkan penjelasan peserta lain.",
-      "Menerima keputusan mufakat bersama dengan lapang dada."
+      "Memahami dan menaati tata tertib berdiskusi.",
+      "Turut aktif menyampaikan pandangan dalam proses diskusi ambalan."
     ]
   },
   {
     level: "bantara",
     point_number: 4,
     category: "Spiritual/Agama",
-    title: "Toleransi dan Kerukunan Antarumat Beragama",
-    description: "Dapat saling menghormati dan menunjukkan toleransi dalam bakti antarumat beragama di lingkungan sekolah maupun masyarakat.",
+    title: "Saling Menghormati dan Toleransi Beragama",
+    description: "Dapat saling menghormati dan toleransi dalam bakti antar umat beragama.",
     sub_points: [
-      "Menghormati teman yang sedang menjalankan ibadah keagamaan.",
-      "Ikut serta dalam kegiatan kemanusiaan dan bakti sosial tanpa membedakan latar belakang agama."
+      "Selalu mengingatkan anggota lain untuk menunaikan kewajiban agamanya.",
+      "Tahu cara bersikap toleran ketika orang lain melakukan kewajiban agamanya."
     ]
   },
   {
     level: "bantara",
     point_number: 5,
     category: "Sosial & Emosional",
-    title: "Keaktifan Pertemuan Ambalan",
-    description: "Mengikuti pertemuan Ambalan sekurang-kurangnya 2 kali setiap bulan secara rutin dan bertanggung jawab.",
+    title: "Mengikuti Pertemuan Ambalan Rutin",
+    description: "Mengikuti pertemuan Ambalan sekurang-kurangnya 2 kali setiap bulan.",
     sub_points: [
-      "Tercatat hadir dalam absensi latihan mingguan atau pertemuan rutin ambalan.",
-      "Berpartisipasi aktif dalam sesi materi dan dinamika sangga."
+      "Tercatat hadir dalam pertemuan dan latihan rutin Ambalan sekurang-kurangnya 2 kali setiap bulan."
     ]
   },
   {
     level: "bantara",
     point_number: 6,
     category: "Sosial & Emosional",
-    title: "Membayar Iuran dari Usaha Sendiri",
-    description: "Setia membayar iuran kepada ambalannya dengan uang yang seluruhnya atau sebagian diperoleh dari usaha sendiri.",
+    title: "Setia Membayar Iuran dari Usaha Sendiri",
+    description: "Setia membayar iuran kepada gugus depan, dengan uang yang diperoleh dari usaha sendiri.",
     sub_points: [
-      "Membayar uang kas ambalan tepat waktu.",
-      "Menjelaskan sumber penghasilan mandiri yang digunakan (wirausaha kecil, jasa, atau penyisihan tabungan jerih payah sendiri)."
+      "Membayar iuran kepada gugus depan setiap latihan mingguan dengan uang yang seluruhnya atau sebagian diperoleh dari usaha sendiri."
     ]
   },
   {
@@ -122,43 +121,39 @@ const bantaraItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
     point_number: 7,
     category: "Sosial & Emosional",
     title: "Berbahasa Indonesia yang Baik dan Benar",
-    description: "Dapat berbahasa Indonesia dengan baik dan benar dalam pergaulan sehari-hari serta menjaga etika berkomunikasi.",
+    description: "Dapat berbahasa Indonesia dengan baik dan benar dalam pergaulan sehari-hari.",
     sub_points: [
-      "Menerapkan kaidah bahasa Indonesia yang santun saat berbicara kepada rekan maupun pembina.",
-      "Menghindari penggunaan kata-kata kasar atau provokatif."
+      "Selalu menggunakan bahasa Indonesia dengan baik dan benar dalam pergaulan sehari-hari."
     ]
   },
   {
     level: "bantara",
     point_number: 8,
     category: "Sosial & Emosional",
-    title: "Membantu Mengelola Kegiatan Ambalan",
-    description: "Telah ikut aktif membantu Sangga Kerja dalam mengelola kegiatan di Ambalan.",
+    title: "Membantu Mengelola Kegiatan di Ambalan",
+    description: "Telah membantu mengelola kegiatan di Ambalan.",
     sub_points: [
-      "Terlibat sebagai panitia pelaksana kegiatan ambalan.",
-      "Menjalankan tugas kepanitiaan dengan disiplin dan penuh tanggung jawab."
+      "Aktif dan terlibat dalam Sangga Kerja pengelolaan kegiatan ambalan."
     ]
   },
   {
     level: "bantara",
     point_number: 9,
     category: "Sosial & Emosional",
-    title: "Kerja Bakti di Masyarakat",
-    description: "Telah ikut aktif dalam kegiatan kerja bakti di lingkungan masyarakat minimal 2 kali.",
+    title: "Aktif Kerja Bakti di Masyarakat",
+    description: "Telah ikut aktif kerja bakti di masyarakat minimal 2 kali.",
     sub_points: [
-      "Melampirkan bukti keikutsertaan kerja bakti (surat keterangan RT/RW atau dokumentasi kegiatan).",
-      "Memberikan kontribusi nyata dalam menjaga kebersihan fasilitas umum."
+      "Minimal 2 kali mengikuti kegiatan kerja bakti di lingkungan tempat tinggal atau masyarakat."
     ]
   },
   {
     level: "bantara",
     point_number: 10,
-    category: "Keterampilan/Intelektual",
-    title: "Menampilkan Kesenian Daerah",
-    description: "Dapat menampilkan satu macam kesenian daerah di depan ambalan atau di depan umum.",
+    category: "Sosial & Emosional",
+    title: "Menampilkan Kesenian Daerah di Depan Umum",
+    description: "Dapat menampilkan kesenian daerah di depan umum minimal satu kali.",
     sub_points: [
-      "Menampilkan seni tari daerah, memainkan alat musik tradisional, atau menyanyikan lagu daerah.",
-      "Mampu menjelaskan filosofi atau makna budaya dari kesenian yang dibawakan."
+      "Secara perorangan maupun bersama teman-temannya menampilkan salah satu kesenian daerah."
     ]
   },
   {
@@ -166,10 +161,10 @@ const bantaraItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
     point_number: 11,
     category: "Keterampilan/Intelektual",
     title: "Memahami AD & ART Gerakan Pramuka",
-    description: "Mengenal, mengerti, dan memahami isi Anggaran Dasar dan Anggaran Rumah Tangga Gerakan Pramuka.",
+    description: "Mengenal, mengerti dan memahami isi AD & ART Gerakan Pramuka.",
     sub_points: [
-      "Menjelaskan asas, tujuan, dan prinsip dasar kepramukaan.",
-      "Menjelaskan metode kepramukaan dan kiasan dasar kepenegakan."
+      "Dapat menyebutkan nomor SK Keppres tentang AD Gerakan Pramuka dan SK Kwarnas tentang ART Gerakan Pramuka.",
+      "Dapat menyebutkan pasal-pasal pokok tentang tujuan, tugas pokok, prinsip dasar kepramukaan, dan metode kepramukaan."
     ]
   },
   {
@@ -177,33 +172,32 @@ const bantaraItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
     point_number: 12,
     category: "Keterampilan/Intelektual",
     title: "Sejarah Kepramukaan Indonesia dan Dunia",
-    description: "Dapat menjelaskan sejarah kepramukaan Indonesia dan dunia secara sistematis.",
+    description: "Dapat menjelaskan sejarah Kepramukaan Indonesia dan Dunia.",
     sub_points: [
-      "Menceritakan riwayat hidup Lord Baden Powell of Gilwell.",
-      "Menceritakan tonggak berdirinya kepanduan dunia dan sejarah Keppres No. 238 Tahun 1961 di Indonesia."
+      "Menyebutkan pendiri kepramukaan dunia (Baden Powell), sejarah pramuka dunia, dan karya buku yang dihasilkan.",
+      "Menceritakan masuknya kepramukaan ke Indonesia hingga perkembangan Gerakan Pramuka sampai saat ini."
     ]
   },
   {
     level: "bantara",
     point_number: 13,
     category: "Keterampilan/Intelektual",
-    title: "Penggunaan Kompas, Jam, dan Tanda Alam",
-    description: "Dapat menggunakan jam, kompas, tanda jejak, dan tanda-tanda alam lainnya dalam pengembaraan.",
+    title: "Navigasi Jam, Kompas, dan Tanda Jejak",
+    description: "Dapat menggunakan jam, kompas, tanda jejak dan tanda-tanda alam lainnya dalam pengembaraan.",
     sub_points: [
-      "Menentukan arah mata angin dengan kompas bidik (azimuth & back-azimuth).",
-      "Menentukan arah mata angin menggunakan jarum jam dan bayangan matahari.",
-      "Membaca minimal 8 jenis tanda jejak di alam terbuka."
+      "Dapat memperkirakan waktu tanpa melihat jam.",
+      "Dapat menjelaskan bagian-bagian kompas, azimuth, back-azimuth, resection, dan intersection.",
+      "Membaca dan membuat tanda jejak, tanda alam, serta membuat peta perjalanan."
     ]
   },
   {
     level: "bantara",
     point_number: 14,
     category: "Sosial & Emosional",
-    title: "Pengamalan Butir-Butir Pancasila",
+    title: "Pengamalan Pancasila dalam Kehidupan Sehari-hari",
     description: "Dapat menjelaskan bentuk pengamalan Pancasila dalam kehidupan sehari-hari.",
     sub_points: [
-      "Menyebutkan contoh konkret penerapan sila pertama hingga kelima dalam kehidupan bermasyarakat.",
-      "Menunjukkan sikap nasionalisme, gotong royong, dan keadilan sosial."
+      "Menyebutkan butir-butir Pancasila dan menyampaikan contoh konkret pengamalannya dalam kehidupan sehari-hari."
     ]
   },
   {
@@ -211,345 +205,337 @@ const bantaraItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
     point_number: 15,
     category: "Keterampilan/Intelektual",
     title: "Mengenal Organisasi ASEAN dan PBB",
-    description: "Dapat menjelaskan tentang sejarah dan peran organisasi ASEAN dan Perserikatan Bangsa-Bangsa (PBB).",
+    description: "Dapat menjelaskan tentang organisasi ASEAN dan PBB.",
     sub_points: [
-      "Menjelaskan latar belakang Deklarasi Bangkok 1967 dan anggota ASEAN.",
-      "Menjelaskan tujuan PBB dan badan-badan khususnya (UNESCO, UNICEF, WHO, UNHCR)."
+      "Menjelaskan kepengurusan, sekretaris jenderal, alamat sekretariat, dan badan organisasi di bawah ASEAN.",
+      "Menjelaskan kepengurusan, sekretaris jenderal, alamat markas, dan badan organisasi di bawah PBB."
     ]
   },
   {
     level: "bantara",
     point_number: 16,
     category: "Keterampilan/Intelektual",
-    title: "Tali Temali dan Pionering",
-    description: "Dapat menerapkan pengetahuannya tentang tali temali dan pionering dalam kehidupan sehari-hari.",
+    title: "Pengetahuan dan Praktik Kewirausahaan",
+    description: "Dapat menjelaskan tentang kewirausahaan.",
     sub_points: [
-      "Dapat membuat simpul hidup, mati, pangkal, tiang, jangkar, dan tarik.",
-      "Dapat mengaplikasikan ikatan palang, silang, dan canggah pada konstruksi pionering (misal: tiang bendera atau rak piring)."
+      "Menjelaskan konsep kewirausahaan dan telah melakukan salah satu kegiatan kewirausahaan secara nyata."
     ]
   },
   {
     level: "bantara",
     point_number: 17,
-    category: "Fisik & Lingkungan",
-    title: "Kerapian Berpakaian dan Kebersihan Lingkungan",
-    description: "Selalu berpakaian rapi dan memelihara kesehatan serta kebersihan diri dan lingkungannya.",
+    category: "Keterampilan/Intelektual",
+    title: "Daur Ulang Barang Bekas Bermanfaat",
+    description: "Dapat mendaur ulang barang bekas menjadi barang yang bermanfaat.",
     sub_points: [
-      "Mengenakan seragam Pramuka lengkap sesuai aturan SK Kwarnas.",
-      "Menjaga kebersihan sanggar ambalan dan lingkungan tempat beraktivitas."
+      "Dapat menjelaskan prosesnya serta menunjukkan karya hasil daur ulang barang bekas yang bermanfaat."
     ]
   },
   {
     level: "bantara",
     point_number: 18,
     category: "Keterampilan/Intelektual",
-    title: "Memimpin Peraturan Baris Berbaris (PBB)",
-    description: "Dapat memimpin baris berbaris dan menjelaskan peraturannya kepada anggota sangganya.",
+    title: "Penerapan Tali Temali dan Pionering",
+    description: "Dapat menerapkan pengetahuannya tentang tali temali dan pionering dalam kehidupan sehari-hari.",
     sub_points: [
-      "Menguasai aba-aba di tempat (sikap sempurna, istirahat, hadap kanan/kiri, balik kanan, jalan di tempat).",
-      "Menguasai aba-aba pindah tempat dan formasi barisan serta dapat memberi komando dengan tegas."
+      "Dapat menguasai serta menggunakan aneka simpul dan ikatan kepramukaan dalam kehidupan sehari-hari."
     ]
   },
   {
     level: "bantara",
     point_number: 19,
     category: "Fisik & Lingkungan",
-    title: "Mengenal Jenis Penyakit dan Pola Sehat",
-    description: "Dapat menyebutkan beberapa penyakit infeksi, degeneratif, dan penyakit yang disebabkan perilaku tidak sehat.",
+    title: "Olahraga Teratur, Renang Gaya Bebas, dan Olahraga Tim",
+    description: "Selalu berolahraga, mampu melakukan olahraga renang gaya bebas dan menguasai 1 (satu) cabang olahraga tim.",
     sub_points: [
-      "Menjelaskan contoh dan penularan penyakit infeksi (TBC, DBD, influenza).",
-      "Menjelaskan contoh penyakit degeneratif (diabetes, hipertensi, jantung).",
-      "Menjelaskan langkah pencegahan melalui Pola Hidup Bersih dan Sehat (PHBS)."
+      "Melakukan olahraga secara teratur minimal satu minggu sekali.",
+      "Mampu mempraktikkan renang gaya bebas dengan teknik pernapasan yang benar.",
+      "Dapat menjelaskan peraturan permainan dan mempraktikkan satu cabang olahraga tim."
     ]
   },
   {
     level: "bantara",
     point_number: 20,
     category: "Fisik & Lingkungan",
-    title: "Perkemahan 3 Hari Berturut-turut",
-    description: "Melakukan perencanaan dan pelaksanaan perkemahan sedikitnya 3 hari berturut-turut.",
+    title: "Perkembangan Fisik Laki-laki dan Perempuan",
+    description: "Dapat menjelaskan perkembangan fisik laki-laki dan perempuan.",
     sub_points: [
-      "Menyusun proposal perencanaan logistik dan tata tertib tapak tenda bersama sangga.",
-      "Melaksanakan perkemahan 3 hari 2 malam dengan mandiri dan menjaga kebersihan alam sekitar."
+      "Dapat memaparkan di depan ambalan mengenai perubahan perkembangan fisik dan psikis pada laki-laki dan perempuan."
     ]
   },
   {
     level: "bantara",
     point_number: 21,
     category: "Fisik & Lingkungan",
-    title: "Mengenal Organ Tubuh Manusia dan Fungsinya",
-    description: "Dapat menyebutkan organ tubuh manusia beserta fungsi utamanya.",
+    title: "Memimpin Peraturan Baris Berbaris (PBB)",
+    description: "Dapat memimpin baris berbaris dan menjelaskan peraturannya kepada anggota sangganya.",
     sub_points: [
-      "Menjelaskan fungsi jantung, paru-paru, lambung, ginjal, hati, dan otak.",
-      "Menjelaskan cara menjaga kesehatan sistem metabolisme dan peredaran darah."
+      "Dapat menjelaskan dan memperagakan minimal 15 gerakan dasar baris-berbaris kepada anggota sangga.",
+      "Dapat memimpin komando barisan dan baris berbaris secara tertib."
     ]
   },
   {
     level: "bantara",
     point_number: 22,
     category: "Fisik & Lingkungan",
-    title: "Bahaya Narkoba, HIV/AIDS, dan Pergaulan Bebas",
-    description: "Memahami tentang bahaya narkoba, HIV/AIDS, dan pergaulan bebas bagi masa depan generasi muda.",
+    title: "Penyakit Infeksi, Degeneratif, dan Pola Hidup Sehat",
+    description: "Dapat menyebutkan beberapa penyakit infeksi, degeneratif dan penyakit yang disebabkan perilaku tidak sehat.",
     sub_points: [
-      "Menjelaskan jenis zat narkotika, psikotropika, dan bahaya ketergantungan fisik-mental.",
-      "Menjelaskan cara penularan dan pencegahan HIV/AIDS serta menolak pergaulan bebas."
+      "Menyebutkan sedikitnya 3 penyakit infeksi beserta penyebabnya.",
+      "Menyebutkan sedikitnya 3 penyakit degeneratif beserta faktor penyebabnya.",
+      "Menyebutkan sedikitnya 3 penyakit akibat perilaku tidak sehat."
     ]
   },
   {
     level: "bantara",
     point_number: 23,
     category: "Fisik & Lingkungan",
-    title: "Olahraga dan Senam Kebugaran Jasmani (SKJ)",
-    description: "Menguasai minimal satu cabang olahraga dan dapat melakukan senam kesegaran jasmani (SKJ).",
+    title: "Mengikuti Perkemahan 3 Hari Berturut-turut",
+    description: "Ikut serta dalam perkemahan selama 3 hari berturut – turut.",
     sub_points: [
-      "Mempraktikkan teknik dasar salah satu cabang olahraga atletik atau permainan (lari, bulutangkis, futsal, renang, dll).",
-      "Dapat melakukan gerakan SKJ secara runtut dan bugar."
+      "Aktif mengikuti dan menyelesaikan kegiatan perkemahan selama minimal 3 hari 2 malam berturut-turut."
     ]
   }
 ];
 
-// FULL 22 BUTIR PENEGAK LAKSANA (SK KWARNAS 198/2011)
+// FULL 22 BUTIR PENEGAK LAKSANA (SK KWARNAS NO. 199 TAHUN 2011)
 const laksanaItems: Omit<SkuItem, "id" | "created_at" | "updated_at">[] = [
   {
     level: "laksana",
     point_number: 1,
     category: "Spiritual/Agama",
-    title: "Pendalaman Ajaran Agama di Muka Ambalan",
-    description: "Dapat menjelaskan makna rukun iman dan rukun islam di muka ambalan (atau materi ajaran keagamaan Katolik/Kristen/Hindu/Buddha) dan memimpin doa.",
+    title: "Pendalaman dan Pengamalan Ajaran Agama",
+    description: "Mampu memahami terhadap perbedaan keyakinan yang dianut oleh orang lain serta bersikap konsisten terhadap pelaksanaan agama yang diyakininya.",
     sub_points: [
-      "Menyampaikan tausiyah / renungan keagamaan singkat di hadapan peserta upacara atau latihan ambalan.",
-      "Memimpin ibadah bersama sesuai tuntunan agama yang dianut."
+      "Islam: Menjelaskan rukun iman & islam di muka ambalan/penggalang, rukun sholat & sholat sunah, rukun puasa & puasa sunah, merawat jenazah, pernah jadi amil zakat, dan hafal ayat tematik Al-Qur'an.",
+      "Katolik: Memahami 7 sakramen, menceritakan riwayat Santo/Santa, dan membahas 10 Perintah Allah dalam kehidupan sehari-hari.",
+      "Kristen Protestan: Bersaksi di depan jemaat/teman sebaya, aktif melayani di gereja, dan mengikuti katekisasi.",
+      "Hindu: Menjelaskan candi/kerajaan Hindu, memimpin Panca Sembah, ajaran Samsara/Punarbawa, Asta Brata, Yoga Asanas, Dharma Gita, dan seni sakral Hindu.",
+      "Buddha: Memimpin kebaktian & hari besar Buddha, mendeskripsikan intisari Tripitaka, puja & doa, sila dalam delapan jalan utama, dan kebenaran Tripitaka."
     ]
   },
   {
     level: "laksana",
     point_number: 2,
     category: "Sosial & Emosional",
-    title: "Menyampaikan Masukan Konstruktif untuk Gugusdepan",
-    description: "Berani menyampaikan usulan, kritik, dan saran dengan sopan dan santun dalam musyawarah Ambalan atau Gugusdepan.",
+    title: "Menerima Kritik dan Menyampaikan Pendapat Santun",
+    description: "Dapat menerima kritik dari orang lain, serta berani mengeluarkan pendapatnya dengan tertib, sopan dan santun kepada orang-orang di sekitarnya.",
     sub_points: [
-      "Memberikan telaah kritis demi kemajuan organisasi gugusdepan.",
-      "Menjaga adab bermusyawarah dan mengutamakan kepentingan bersama."
+      "Mendengar pendapat orang lain dengan lapang dada.",
+      "Mampu menyampaikan pendapatnya dengan santun tanpa menyinggung orang lain.",
+      "Memahami dan menaati tata cara mengeluarkan pendapat secara tertib."
     ]
   },
   {
     level: "laksana",
     point_number: 3,
     category: "Sosial & Emosional",
-    title: "Memimpin Jalannya Diskusi dengan Baik",
-    description: "Dapat bertindak sebagai moderator atau memimpin jalannya diskusi ambalan dengan adil, tertib, dan menghasilkan keputusan bermutu.",
+    title: "Memimpin Diskusi Ambalan dan Mengambil Keputusan",
+    description: "Dapat mengikuti dan atau memimpin diskusi Ambalan dan mampu mengambil keputusan.",
     sub_points: [
-      "Mampu mengarahkan jalannya tukar pikiran agar tidak menyimpang dari agenda.",
-      "Mampu menyimpulkan hasil musyawarah secara lugas."
+      "Mengetahui tata cara memimpin forum diskusi.",
+      "Pernah memimpin sebuah diskusi ambalan.",
+      "Pernah mengambil keputusan dengan mempertimbangkan risiko dan konsekuensi keputusan."
     ]
   },
   {
     level: "laksana",
     point_number: 4,
-    category: "Spiritual/Agama",
-    title: "Pelopor Kerukunan dan Bakti Antarumat Beragama",
-    description: "Dapat mengajak anggota ambalan untuk saling menghormati dan menunjukkan toleransi dalam bakti antarumat beragama.",
+    category: "Sosial & Emosional",
+    title: "Menjadi Penengah dan Pemberi Solusi Kelompok",
+    description: "Dapat menjadi penengah (memberi solusi), jika terjadi ketidaksepahaman dalam kelompoknya.",
     sub_points: [
-      "Menginisiasi kegiatan bakti kemanusiaan lintas agama.",
-      "Menjadi teladan dalam memelihara kerukunan antarumat beragama di ambalan."
+      "Menyimak dan menyikapi masalah dengan pikiran jernih tanpa prasangka.",
+      "Memberikan pendapat secara santun dan objektif.",
+      "Memberikan solusi pemecahan yang adil dan tidak memihak."
     ]
   },
   {
     level: "laksana",
     point_number: 5,
     category: "Sosial & Emosional",
-    title: "Keaktifan Intensif Pertemuan Ambalan",
-    description: "Mengikuti pertemuan Ambalan sekurang-kurangnya 3 kali setiap bulan dan aktif membina dinamika sangga.",
+    title: "Keaktifan Pertemuan Ambalan (Minimal 3 Kali Sebulan)",
+    description: "Mengikuti pertemuan Ambalan sekurang-kurangnya 3 kali setiap bulan.",
     sub_points: [
-      "Menunjukkan absensi konsisten pada minimal 3 pertemuan rutin per bulan.",
-      "Membantu dewan ambalan dalam menyiapkan materi latihan mingguan."
+      "Telah mengikuti pertemuan Ambalan sekurang-kurangnya 3 kali setiap bulan dalam kurun waktu minimal 4 bulan."
     ]
   },
   {
     level: "laksana",
     point_number: 6,
     category: "Sosial & Emosional",
-    title: "Kemandirian Usaha dan Membantu Rekan",
-    description: "Setia membayar iuran kepada ambalannya dengan uang yang seluruhnya diperoleh dari usaha sendiri serta dapat membantu teman merencanakan usaha mandiri.",
+    title: "Iuran Mandiri dan Mengelola Administrasi Keuangan",
+    description: "Setia membayar iuran kepada gugus depannya, dengan uang diperoleh dari usaha sendiri, serta membantu Ambalan dalam mengelola administrasi keuangan.",
     sub_points: [
-      "Memiliki sumber dana mandiri untuk kebutuhan kepramukaan tanpa membebani orang tua.",
-      "Membantu rekan ambalan merancang ide bisnis / usaha kreatif sangga."
+      "Setiap latihan mingguan membayar iuran gudep dari hasil usaha sendiri.",
+      "Pernah membantu mengelola administrasi pembukuan keuangan Ambalan."
     ]
   },
   {
     level: "laksana",
     point_number: 7,
     category: "Sosial & Emosional",
-    title: "Berbahasa Indonesia Baku dalam Forum Resmi",
-    description: "Dapat berbahasa Indonesia dengan baik dan benar dalam pertemuan resmi ambalan dan forum formal.",
+    title: "Memimpin Rapat dan Membuat Risalah",
+    description: "Dapat memimpin rapat dan membuat risalah dengan baik.",
     sub_points: [
-      "Mampu menyampaikan sambutan, laporan kegiatan, atau presentasi formal menggunakan bahasa baku.",
-      "Menguasai tata bahasa dan etika protokoler kepramukaan."
+      "Pernah memimpin jalannya rapat ambalan secara efektif.",
+      "Menyusun dan menyampaikan risalah rapat sesuai kaidah penulisan risalah dalam buku ambalan."
     ]
   },
   {
     level: "laksana",
     point_number: 8,
     category: "Sosial & Emosional",
-    title: "Pernah Memimpin Kegiatan di Ambalan/Gudep",
-    description: "Pernah menjadi ketua sangga kerja atau koordinator utama dalam pelaksanaan kegiatan ambalan atau gugusdepan.",
+    title: "Memimpin Kegiatan di Tingkat Ambalan",
+    description: "Pernah memimpin kegiatan di tingkat Ambalan.",
     sub_points: [
-      "Melampirkan surat keputusan / mandat sebagai pimpinan kegiatan ambalan.",
-      "Menyusun laporan pertanggungjawaban (LPJ) pelaksanaan kegiatan."
+      "Pernah memimpin pelaksanaan salah satu kegiatan ambalan sebagai Ketua Sangga Kerja."
     ]
   },
   {
     level: "laksana",
     point_number: 9,
     category: "Sosial & Emosional",
-    title: "Memimpin Bakti Masyarakat Minimal 3 Kali",
-    description: "Pernah memimpin bakti di masyarakat minimal 3 kali dan memberikan dampak positif nyata.",
+    title: "Memimpin Kerja Bakti di Masyarakat",
+    description: "Pernah memimpin kerja bakti di masyarakat minimal 2 kali.",
     sub_points: [
-      "Menginisiasi aksi sosial kemasyarakatan (donor darah, santunan, pembersihan sungai, dll).",
-      "Mengoordinir regu kerja lapangan secara terstruktur."
+      "Pernah memimpin kerja bakti di lingkungan masyarakat minimal 2 kali yang diikuti oleh warga masyarakat."
     ]
   },
   {
     level: "laksana",
     point_number: 10,
-    category: "Keterampilan/Intelektual",
-    title: "Memimpin Pertunjukan Kesenian Tradisional",
-    description: "Dapat memimpin dan menampilkan pertunjukan seni budaya daerah di depan umum.",
+    category: "Sosial & Emosional",
+    title: "Memimpin Kelompok Menampilkan Kesenian Daerah",
+    description: "Dapat memimpin kelompok dalam menampilkan salah satu jenis kesenian daerah.",
     sub_points: [
-      "Mengatur tata artistik pentas seni budaya tradisional.",
-      "Tampil memukau sebagai pemeran utama / dirigen / pemimpin pertunjukan kesenian."
+      "Pernah memimpin anggota ambalan menampilkan kesenian daerah dalam suatu perkemahan atau acara resmi."
     ]
   },
   {
     level: "laksana",
     point_number: 11,
     category: "Keterampilan/Intelektual",
-    title: "Menjelaskan Isi AD & ART Gerakan Pramuka",
-    description: "Dapat menjelaskan isi AD & ART Gerakan Pramuka kepada anggota ambalan dan adik penegak.",
+    title: "Menjelaskan Isi AD & ART di Depan Ambalan",
+    description: "Dapat menjelaskan isi AD & ART Gerakan Pramuka kepada Ambalan.",
     sub_points: [
-      "Mampu memberikan materi sosialisasi AD & ART kepada calon penegak bantara.",
-      "Memahami fungsi dewan kehormatan dan mekanisme musyawarah gugusdepan."
+      "Telah memaparkan Tujuan, Tugas Pokok, Fungsi, Prinsip Dasar, dan Metode Kepramukaan di depan anggota ambalan."
     ]
   },
   {
     level: "laksana",
     point_number: 12,
     category: "Keterampilan/Intelektual",
-    title: "Menjelaskan Sejarah Kepramukaan Dunia dan Nasional",
-    description: "Dapat menjelaskan sejarah perkembangan kepramukaan Indonesia dan dunia secara mendalam kepada ambalan.",
+    title: "Menjelaskan Sejarah Kepramukaan di Muka Umum",
+    description: "Dapat menjelaskan di muka umum tentang sejarah kepramukaan Indonesia dan dunia.",
     sub_points: [
-      "Memaparkan tonggak Jambore Dunia dan deklarasi kepanduan internasional.",
-      "Menjelaskan peran tokoh-tokoh pandu nasional seperti Sri Sultan Hamengkubuwono IX."
+      "Telah menjelaskan sejarah kepramukaan Indonesia dan dunia secara sistematis di muka perindukan Siaga atau pasukan Penggalang."
     ]
   },
   {
     level: "laksana",
     point_number: 13,
     category: "Keterampilan/Intelektual",
-    title: "Navigasi Darat Peta Topografi",
-    description: "Dapat menggunakan navigasi darat (kompas bidik, peta topografi, teknik resection dan intersection) dalam pengembaraan.",
+    title: "Melakukan Pengembaraan 3 Hari atau Mengatur Perkemahan",
+    description: "Dapat melakukan pengembaraan selama 3 hari dan atau mengatur kehidupan perkemahan selama minimal 3 hari.",
     sub_points: [
-      "Mampu membaca garis kontur ketinggian, koordinat UTM/grid, dan skala peta.",
-      "Mampu menentukan koordinat posisi sendiri dengan teknik resection di medan terbuka."
+      "Membuat rencana pengembaraan, izin, logistik, dan melapor ke kepolisian di jalur pengembaraan.",
+      "Merencanakan dan mengatur kehidupan perkemahan minimal 3 hari (jadwal, perlengkapan, dan anggaran)."
     ]
   },
   {
     level: "laksana",
     point_number: 14,
-    category: "Sosial & Emosional",
-    title: "Mengaplikasikan Nilai Pancasila di Ambalan",
-    description: "Dapat menjelaskan dan mengaplikasikan butir-butir Pancasila kepada anggota ambalan dalam tindakan nyata.",
+    category: "Keterampilan/Intelektual",
+    title: "Sejarah, Arti, dan Tata Cara Penggunaan Sang Merah Putih",
+    description: "Dapat menjelaskan sejarah, arti, tatacara penggunaan dan kiasan Sang Merah Putih.",
     sub_points: [
-      "Menyusun program kerja sangga berlandaskan semangat kebhinekaan.",
-      "Menyelesaikan dinamika sangga secara musyawarah mufakat."
+      "Dapat menyebutkan isi UU No. 24 Tahun 2009 tentang Bendera, Bahasa, Lambang Negara, serta Lagu Kebangsaan."
     ]
   },
   {
     level: "laksana",
     point_number: 15,
     category: "Keterampilan/Intelektual",
-    title: "Memaparkan Diplomasi Indonesia di ASEAN & PBB",
-    description: "Dapat memaparkan hubungan Indonesia dalam organisasi internasional ASEAN dan PBB serta politik luar negeri bebas aktif.",
+    title: "Peranan Indonesia dalam ASEAN dan PBB",
+    description: "Dapat menjelaskan peran Indonesia dalam organisasi ASEAN dan PBB.",
     sub_points: [
-      "Menjelaskan kontribusi Pasukan Garuda Indonesia dalam misi penjaga perdamaian PBB.",
-      "Menjelaskan peran strategis Indonesia sebagai salah satu pendiri ASEAN."
+      "Mampu menjelaskan kontribusi dan peranan strategis Indonesia dalam organisasi ASEAN dan PBB."
     ]
   },
   {
     level: "laksana",
     point_number: 16,
     category: "Keterampilan/Intelektual",
-    title: "Rancang Bangun Pionering Lanjutan",
-    description: "Dapat membuat rancangan dan memimpin pembuatan pionering jembatan, tiang bendera kaki tiga berputar, atau menara pandang.",
+    title: "Keterampilan Kewirausahaan yang Menghasilkan Uang",
+    description: "Telah memiliki keterampilan kewirausahaan yang dapat menghasilkan uang.",
     sub_points: [
-      "Menyusun sketsa kerja teknis pionering berskala.",
-      "Memimpin perakitan konstruksi bambu/tongkat yang kokoh dan aman."
+      "Pernah menjalankan usaha mandiri maupun kelompok yang menghasilkan keuntungan nyata secara berkala."
     ]
   },
   {
     level: "laksana",
     point_number: 17,
-    category: "Fisik & Lingkungan",
-    title: "Pelopor Sanitasi dan Kelestarian Alam",
-    description: "Selalu membiasakan diri hidup bersih dan memimpin gerakan kebersihan lingkungan perkemahan dan masyarakat.",
+    category: "Keterampilan/Intelektual",
+    title: "Membuat Peralatan Teknologi Tepat Guna (TTG)",
+    description: "Dapat membuat salah satu jenis peralatan teknologi tepat guna.",
     sub_points: [
-      "Menerapkan sistem pengelolaan sampah terpadu (reduce, reuse, recycle) di perkemahan.",
-      "Menjaga sumber air bersih perkemahan bebas dari kontaminasi kimia/limbah sabun."
+      "Mampu merancang dan menunjukkan peralatan teknologi tepat guna kreasi sendiri yang berdaya guna."
     ]
   },
   {
     level: "laksana",
     point_number: 18,
     category: "Keterampilan/Intelektual",
-    title: "Melatih Baris Berbaris (Instruktur PBB)",
-    description: "Mampu melatih baris berbaris dan peraturan PBB kepada tingkatan di bawahnya (Penggalang atau Penegak Bantara).",
+    title: "Membuat Struktur Pionering Bermanfaat Bagi Masyarakat",
+    description: "Secara berkelompok dapat membuat struktur dari keterampilan tali temali dan pionering, yang dapat digunakan masyarakat.",
     sub_points: [
-      "Menjadi instruktur latihan baris berbaris dan variasi formasi.",
-      "Mampu mengoreksi gerakan anggota dengan metode instruksi yang efektif."
+      "Membuat struktur pionering (jembatan, gapura, pos pantau) bersama anggota lain yang dapat dimanfaatkan langsung oleh masyarakat."
     ]
   },
   {
     level: "laksana",
     point_number: 19,
     category: "Fisik & Lingkungan",
-    title: "Pertolongan Pertama dan Pencegahan Penyakit",
-    description: "Mampu memberikan pertolongan pertama pada gawat darurat dan pencegahan terhadap penyakit menular serta degeneratif.",
+    title: "Olahraga Rutin, Renang Gaya Selain Bebas, dan Cabang Olahraga",
+    description: "Selalu berolahraga, Dapat melakukan olahraga renang selain gaya bebas dan menguasai 1 (satu) cabang olahraga lainnya.",
     sub_points: [
-      "Mampu melakukan pembidaian fraktur tulang, penanganan hipotermia, dan balut tekan perdarahan.",
-      "Mampu menyosialisasikan pola hidup sehat kepada warga sekolah."
+      "Rutin berolahraga setiap minggu.",
+      "Mampu mempraktikkan minimal satu gaya renang selain gaya bebas (dada/punggung/kupu-kupu) dengan benar.",
+      "Menguasai satu cabang olahraga lainnya dan memahami tata peraturannya."
     ]
   },
   {
     level: "laksana",
     point_number: 20,
     category: "Fisik & Lingkungan",
-    title: "Memimpin Ekspedisi Perkemahan 3 Hari",
-    description: "Pernah merencanakan, membiayai, dan melaksanakan perkemahan selama 3 hari berturut-turut secara mandiri.",
+    title: "Memahami dan Menjelaskan Kesehatan Reproduksi",
+    description: "Dapat memahami dan menjelaskan tentang kesehatan reproduksi.",
     sub_points: [
-      "Membuat estimasi anggaran biaya logistik perkemahan secara akurat.",
-      "Memimpin operasi tapak kemah dari pendirian hingga pembongkaran tenda."
+      "Dapat menjelaskan pemahaman kesehatan reproduksi secara ilmiah dan santun kepada anggota ambalan."
     ]
   },
   {
     level: "laksana",
     point_number: 21,
     category: "Fisik & Lingkungan",
-    title: "Edukasi Kesehatan Reproduksi Remaja",
-    description: "Dapat menjelaskan organ reproduksi manusia dan cara menjaga kesehatan reproduksi bagi remaja secara ilmiah dan santun.",
+    title: "Mempersiapkan dan Melaksanakan Upacara Umum",
+    description: "Dapat mempersiapkan dan melaksanakan upacara umum minimal 3 kali.",
     sub_points: [
-      "Menjelaskan proses perubahan pubertas dan fisiologi organ reproduksi.",
-      "Menjelaskan pentingnya menjaga higienitas reproduksi dan pencegahan penyakit menular."
+      "Menyusun persiapan upacara pembukaan dan penutupan latihan minimal 3 kali.",
+      "Melaksanakan dan bertugas dalam upacara pembukaan dan penutupan latihan minimal 3 kali."
     ]
   },
   {
     level: "laksana",
     point_number: 22,
     category: "Fisik & Lingkungan",
-    title: "Memimpin Olahraga dan Senam Jasmani",
-    description: "Aktif melakukan satu cabang olahraga serta dapat memimpin senam kesegaran jasmani di depan khalayak ambalan.",
+    title: "Penyebab dan Pencegahan Penyakit Infeksi & Degeneratif",
+    description: "Dapat menyebutkan penyebab dan cara pencegahan penyakit infeksi, degeneratif dan penyakit yang disebabkan perilaku tidak sehat.",
     sub_points: [
-      "Menjadi instruktur pemanasan, senam inti, dan pendinginan.",
-      "Menunjukkan kebugaran jasmani prima dan sportivitas tinggi."
+      "Menyebutkan minimal 3 penyakit infeksi, penyebab, dan cara pencegahannya.",
+      "Menyebutkan minimal 3 penyakit degeneratif, penyebab, dan cara pencegahannya.",
+      "Menyebutkan minimal 3 penyakit akibat perilaku tidak sehat dan langkah pencegahannya."
     ]
   }
 ];

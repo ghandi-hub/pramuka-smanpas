@@ -136,94 +136,125 @@ export const POINT1_SUBPOINTS: Record<
   laksana: {
     islam: [
       {
-        title: "Memimpin Shalat Berjamaah",
-        description: "Mampu memimpin shalat berjamaah.",
+        title: "Makna Rukun Iman & Islam di Muka Ambalan/Penggalang",
+        description:
+          "Dapat menjelaskan makna Rukun Iman dan Rukun Islam di muka Pasukan Penggalang atau Ambalan Penegak.",
       },
       {
-        title: "Menjadi Muadzin atau Iqamah",
-        description: "Mampu menjadi muadzin atau mengumandangkan iqamah.",
+        title: "Rukun Shalat & Mendirikan Shalat Sunah",
+        description:
+          "Dapat menjelaskan rukun sholat dan dapat mendirikan Sholat sunah.",
       },
       {
-        title: "Kultum Singkat di Ambalan",
-        description: "Memberikan kultum singkat di ambalan.",
+        title: "Rukun Puasa & Melaksanakan Puasa Sunah",
+        description:
+          "Dapat menjelaskan rukun puasa serta dapat melakukan salah satu puasa sunah.",
       },
       {
-        title: "Pendalaman Materi Keagamaan",
-        description: "Melakukan pendalaman materi keagamaan.",
+        title: "Tata Cara Mengurus Jenazah",
+        description: "Memahami tata cara merawat/mengurus jenazah.",
+      },
+      {
+        title: "Pernah Menjadi Amil Zakat",
+        description: "Pernah menjadi Amil Zakat.",
+      },
+      {
+        title: "Hafalan dan Penjelasan Ayat Tematik Al-Qur'an",
+        description:
+          "Dapat menghafal ayat tematik dari Al-Qur'an dan mampu menjelaskannya.",
       },
     ],
     katolik: [
       {
-        title: "Memimpin Doa Rosario atau Renungan",
-        description: "Mampu memimpin doa rosario atau renungan bersama.",
+        title: "Memahami dan Mendalami 7 Sakramen",
+        description: "Memahami dan mendalami 7 sakramen.",
       },
       {
-        title: "Menjadi Lektor atau Pemazmur",
-        description: "Mampu bertugas sebagai lektor atau pemazmur dalam liturgi.",
-      },
-      {
-        title: "Renungan Singkat di Ambalan",
-        description: "Memberikan renungan singkat di ambalan.",
-      },
-      {
-        title: "Pendalaman Materi Keagamaan",
+        title: "Riwayat Santo / Santa",
         description:
-          "Pendalaman materi keagamaan (Sakramen dan Ajaran Sosial Gereja).",
+          "Menghayati dan dapat menceritakan riwayat salah satu Santo / Santa.",
+      },
+      {
+        title: "Membahas 10 Perintah Allah",
+        description:
+          "Membahas 10 Perintah Allah, dilengkapi dengan contoh kehidupan sehari-hari.",
       },
     ],
     kristen: [
       {
-        title: "Memimpin Doa atau Ibadah Kelompok",
-        description: "Mampu memimpin doa atau ibadah kelompok.",
-      },
-      {
-        title: "Pelayan Liturgi",
+        title: "Memberi Kesaksian Iman",
         description:
-          "Mampu menjadi pelayan liturgi (pembaca Alkitab atau pemusik).",
+          "Dapat memberi kesaksian di depan jemaat atau teman sebaya.",
       },
       {
-        title: "Renungan Singkat di Ambalan",
-        description: "Memberikan renungan singkat di ambalan.",
+        title: "Partisipasi Pelayanan Gereja",
+        description:
+          "Dapat berpartisipasi aktif dalam pelayanan Gereja sesuai bakat dan kemampuannya.",
       },
       {
-        title: "Pendalaman Materi Keagamaan",
-        description: "Pendalaman materi keagamaan (katekisasi).",
+        title: "Mengikuti Katekisasi",
+        description: "Telah mengikuti pengajaran Agama (Katekisasi).",
       },
     ],
     hindu: [
       {
-        title: "Memimpin Doa Bersama (Tri Sandhya)",
-        description: "Mampu memimpin doa bersama Tri Sandhya.",
+        title: "Sejarah Kerajaan / Candi Hindu di Indonesia",
+        description:
+          "Dapat menjelaskan sejarah kerajaan / candi–candi agama Hindu di Indonesia.",
       },
       {
-        title: "Pembaca Sloka atau Pemimpin Upacara",
-        description: "Mampu membaca sloka atau memimpin persembahyangan.",
+        title: "Pemimpin Persembahyangan Panca Sembah",
+        description:
+          "Dapat melafalkan dan bertindak sebagai pemimpin persembahyangan Panca Sembah.",
       },
       {
-        title: "Dharma Wacana Singkat di Ambalan",
-        description: "Memberikan dharma wacana singkat di ambalan.",
+        title: "Ajaran Samsara / Punarbawa (Reinkarnasi)",
+        description:
+          "Dapat menjelaskan Samsara / Punarbawa atau reinkarnasi sebagai bentuk untuk penyempurnaan kelahiran berikutnya.",
       },
       {
-        title: "Pendalaman Materi Keagamaan",
-        description: "Pendalaman materi ajaran Hindu.",
+        title: "Konsep Ajaran Asta Brata",
+        description: "Dapat menjelaskan konsep Ajaran Asta Brata.",
+      },
+      {
+        title: "Gerakan, Fungsi & Manfaat Yoga Asanas",
+        description:
+          "Dapat melakukan gerakan dan menjelaskan fungsi, serta manfaat dari setiap gerakan Yoga Asanas.",
+      },
+      {
+        title: "Melafalkan dan Mengkidungkan Dharma Gita",
+        description:
+          "Dapat melafalkan dan mengkidungkan lebih dari satu bentuk Dharma Gita.",
+      },
+      {
+        title: "Bentuk dan Fungsi Seni Sakral Hindu",
+        description:
+          "Dapat menjelaskan bentuk dan fungsi dari seni sakral keagamaan Hindu.",
       },
     ],
     buddha: [
       {
-        title: "Memimpin Puja Bakti",
-        description: "Mampu memimpin puja bakti bersama.",
+        title: "Memimpin Kebaktian & Perayaan Hari Besar",
+        description:
+          "Dapat memimpin dan mengorganisir kebaktian (pagi dan sore) serta perayaan hari-hari besar Agama Buddha (hari Waisak, Asadha, Kathina, Maggapuja).",
       },
       {
-        title: "Pembaca Paritta atau Gatha",
-        description: "Mampu menjadi pembaca paritta atau gatha.",
+        title: "Saddha - Intisari Tripitaka",
+        description:
+          "Saddha: Mendeskripsikan ruang lingkup dan intisari Tripitaka.",
       },
       {
-        title: "Ceramah Dhamma Singkat di Ambalan",
-        description: "Memberikan ceramah Dhamma singkat di ambalan.",
+        title: "Makna & Manfaat Puja Serta Doa",
+        description: "Menjelaskan makna dan manfaat puja serta doa.",
       },
       {
-        title: "Pendalaman Ajaran Buddha",
-        description: "Melakukan pendalaman ajaran Buddha.",
+        title: "Sila dalam Delapan Jalan Utama",
+        description:
+          "Mendeskripsikan sila sebagai bagian dari jalan mulia berunsur delapan.",
+      },
+      {
+        title: "Kebenaran dalam Tripitaka",
+        description: "Menjelaskan kebenaran yang terdapat dalam Tripitaka.",
       },
     ],
   },

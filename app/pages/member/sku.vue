@@ -67,7 +67,11 @@ const selectedReligion = computed<ReligionKey>(() =>
   normalizeReligion(profile.value?.religion || "islam"),
 );
 
-const { data: skuData, pending: loading, refresh } = await useAsyncData(
+const {
+  data: skuData,
+  pending: loading,
+  refresh,
+} = await useAsyncData(
   () => `member-sku-data-${level.value}`,
   async () => {
     const [fetchedItems, fetchedProgress, allBantara] = await Promise.all([
@@ -88,7 +92,9 @@ const { data: skuData, pending: loading, refresh } = await useAsyncData(
 
 const items = computed<SkuItem[]>(() => skuData.value?.items ?? []);
 const progress = computed<any[]>(() => skuData.value?.progress ?? []);
-const bantaraItems = computed<SkuItem[]>(() => skuData.value?.bantaraItems ?? []);
+const bantaraItems = computed<SkuItem[]>(
+  () => skuData.value?.bantaraItems ?? [],
+);
 const submitting = ref(false);
 
 // Pagination
@@ -157,7 +163,9 @@ const filteredItems = computed(() => {
 });
 
 const totalItems = computed(() => filteredItems.value.length);
-const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value) || 1);
+const totalPages = computed(
+  () => Math.ceil(totalItems.value / pageSize.value) || 1,
+);
 
 const paginatedItems = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
@@ -193,31 +201,29 @@ const percentage = computed(() =>
     : 0,
 );
 
-const statusMeta: Record<
-  string,
-  { label: string; class: string; icon: any }
-> = {
-  none: {
-    label: "sku.status.not_tested",
-    class: "bg-muted text-muted-foreground border-border",
-    icon: CircleDashed,
-  },
-  pending: {
-    label: "sku.status.pending",
-    class: "bg-amber-500/10 text-amber-600 border-amber-500/30",
-    icon: Clock,
-  },
-  verified: {
-    label: "sku.status.verified",
-    class: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-    icon: CheckCircle2,
-  },
-  rejected: {
-    label: "sku.status.rejected",
-    class: "bg-destructive/10 text-destructive border-destructive/30",
-    icon: FileWarning,
-  },
-};
+const statusMeta: Record<string, { label: string; class: string; icon: any }> =
+  {
+    none: {
+      label: "sku.status.not_tested",
+      class: "bg-muted text-muted-foreground border-border",
+      icon: CircleDashed,
+    },
+    pending: {
+      label: "sku.status.pending",
+      class: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+      icon: Clock,
+    },
+    verified: {
+      label: "sku.status.verified",
+      class: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+      icon: CheckCircle2,
+    },
+    rejected: {
+      label: "sku.status.rejected",
+      class: "bg-destructive/10 text-destructive border-destructive/30",
+      icon: FileWarning,
+    },
+  };
 
 const getStatusOfId = (id: string): ProgressStatus | "none" => {
   return progressMap.value.get(id)?.status ?? "none";
@@ -344,7 +350,9 @@ const handleSubmit = async () => {
     await load();
   } catch (e: any) {
     const { toast } = await import("vue-sonner");
-    toast.error(e?.data?.statusMessage || e?.message || "Gagal mengajukan ujian");
+    toast.error(
+      e?.data?.statusMessage || e?.message || "Gagal mengajukan ujian",
+    );
   } finally {
     submitting.value = false;
   }
@@ -370,22 +378,30 @@ onMounted(() => {
 <template>
   <div class="flex flex-col gap-6">
     <!-- Page heading -->
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+    <div
+      class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
+    >
       <div>
-        <p class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-2">
+        <p
+          class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-2"
+        >
           <BookOpen class="w-4 h-4" />
           {{ t("sku.header.badge") }}
         </p>
         <h1 class="font-display text-2xl lg:text-3xl font-bold tracking-tight">
           {{ t("sku.header.title") }}
         </h1>
-        <p class="text-muted-foreground mt-1 max-w-2xl">{{ t("sku.header.description") }}</p>
+        <p class="text-muted-foreground mt-1 max-w-2xl">
+          {{ t("sku.header.description") }}
+        </p>
       </div>
     </div>
 
     <!-- Level Switcher -->
     <div class="flex justify-center">
-      <div class="inline-flex p-1.5 rounded-2xl bg-card border border-border shadow-sm">
+      <div
+        class="inline-flex p-1.5 rounded-2xl bg-card border border-border shadow-sm"
+      >
         <button
           v-for="lvl in levels"
           :key="lvl"
@@ -426,7 +442,9 @@ onMounted(() => {
 
     <!-- Progress Card -->
     <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4"
+      >
         <div class="flex items-center gap-3">
           <div
             class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary"
@@ -434,7 +452,9 @@ onMounted(() => {
             <Award class="w-6 h-6" />
           </div>
           <div>
-            <h3 class="font-display font-bold text-lg text-foreground capitalize">
+            <h3
+              class="font-display font-bold text-lg text-foreground capitalize"
+            >
               Buku Syarat Kecakapan Penegak {{ level }}
             </h3>
             <p class="text-xs text-muted-foreground">
@@ -444,9 +464,14 @@ onMounted(() => {
         </div>
         <div class="flex items-center gap-4">
           <span class="text-sm font-semibold text-muted-foreground">
-            <span class="text-primary text-base font-bold">{{ verifiedCount }}</span> / {{ totalCount }} Butir Lulus
+            <span class="text-primary text-base font-bold">{{
+              verifiedCount
+            }}</span>
+            / {{ totalCount }} Butir Lulus
           </span>
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
+          <span
+            class="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary"
+          >
             {{ percentage }}%
           </span>
         </div>
@@ -485,13 +510,19 @@ onMounted(() => {
     </div>
 
     <!-- TABEL BUKU SKU -->
-    <div class="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+    <div
+      class="bg-card border border-border rounded-2xl shadow-sm overflow-hidden"
+    >
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <tr
+              class="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
               <th scope="col" class="py-4 px-4 w-16 text-center">No</th>
-              <th scope="col" class="py-4 px-6 min-w-[320px]">Poin Syarat Kecakapan</th>
+              <th scope="col" class="py-4 px-6 min-w-[320px]">
+                Poin Syarat Kecakapan
+              </th>
               <th scope="col" class="py-4 px-4 w-36 text-center">Aksi</th>
               <th scope="col" class="py-4 px-4 w-36 text-center">Status</th>
             </tr>
@@ -500,7 +531,9 @@ onMounted(() => {
             <!-- Loading State -->
             <tr v-if="loading">
               <td colspan="4" class="py-16 text-center">
-                <Loader2 class="w-8 h-8 animate-spin mx-auto text-primary mb-2" />
+                <Loader2
+                  class="w-8 h-8 animate-spin mx-auto text-primary mb-2"
+                />
                 <p class="text-sm text-muted-foreground">Memuat buku SKU...</p>
               </td>
             </tr>
@@ -520,42 +553,67 @@ onMounted(() => {
               <template v-if="item.point_number === 1">
                 <!-- Baris Induk Poin 1 -->
                 <tr class="bg-muted/20 font-medium">
-                  <td class="py-4 px-4 text-center font-bold text-base align-top">
+                  <td
+                    class="py-4 px-4 text-center font-bold text-base align-top"
+                  >
                     1
                   </td>
                   <td colspan="3" class="py-4 px-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"
+                    >
                       <div>
-                        <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent/10 text-accent mb-1">
+                        <!-- <span
+                          class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent/10 text-accent mb-1"
+                        >
                           {{ item.category }}
-                        </span>
-                        <h4 class="font-bold text-base text-foreground">
+                        </span> -->
+                        <!-- <h4 class="font-bold text-base text-foreground">
                           {{ item.title }}
-                        </h4>
+                        </h4> -->
                         <p class="text-xs text-muted-foreground mt-0.5">
                           {{ item.description }}
                         </p>
                       </div>
                       <!-- Ringkasan Kelulusan Poin 1 -->
                       <div class="shrink-0 flex items-center gap-2">
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-lg border" :class="statusMeta[getPoint1OverallStatus()].class">
-                          {{ getPoint1VerifiedCount().verified }}/{{ getPoint1VerifiedCount().total }} Sub-butir
+                        <span
+                          class="text-xs font-semibold px-2.5 py-1 rounded-lg border"
+                          :class="statusMeta[getPoint1OverallStatus()].class"
+                        >
+                          {{ getPoint1VerifiedCount().verified }}/{{
+                            getPoint1VerifiedCount().total
+                          }}
+                          Sub-butir
                         </span>
                       </div>
                     </div>
 
                     <!-- Keterangan Agama Berdasarkan Profil Anggota -->
                     <div class="pt-2 border-t border-border/60">
-                      <div class="flex flex-wrap items-center justify-between gap-2">
+                      <div
+                        class="flex flex-wrap items-center justify-between gap-2"
+                      >
                         <div class="flex items-center gap-2">
-                          <span class="text-xs font-semibold text-muted-foreground">
+                          <span
+                            class="text-xs font-semibold text-muted-foreground"
+                          >
                             Ajaran Agama:
                           </span>
-                          <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                            {{ SKU_RELIGIONS.find((r) => r.key === selectedReligion)?.label }}
+                          <span
+                            class="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20"
+                          >
+                            {{
+                              SKU_RELIGIONS.find(
+                                (r) => r.key === selectedReligion,
+                              )?.label
+                            }}
                           </span>
-                          <span class="text-[11px] text-muted-foreground hidden sm:inline">
-                            (Butir ujian disesuaikan otomatis dengan agama yang dianut)
+                          <span
+                            class="text-[11px] text-muted-foreground hidden sm:inline"
+                          >
+                            (Butir ujian disesuaikan otomatis dengan agama yang
+                            dianut)
                           </span>
                         </div>
                         <NuxtLink
@@ -576,15 +634,19 @@ onMounted(() => {
                   class="hover:bg-muted/30 transition-colors border-t border-border/50 bg-background"
                 >
                   <!-- Sub Number -->
-                  <td class="py-3 px-4 text-center text-xs font-semibold text-muted-foreground bg-muted/10">
+                  <td
+                    class="py-3 px-4 text-center text-xs font-semibold text-muted-foreground bg-muted/10"
+                  >
                     1.{{ subIdx + 1 }}
                   </td>
                   <!-- Sub Content -->
                   <td class="py-3 px-6">
-                    <div class="font-semibold text-foreground text-sm">
+                    <!-- <div class="font-semibold text-foreground text-sm">
                       {{ sub.title }}
-                    </div>
-                    <div class="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                    </div> -->
+                    <div
+                      class="text-xs text-muted-foreground mt-0.5 leading-relaxed"
+                    >
                       {{ sub.description }}
                     </div>
                   </td>
@@ -609,9 +671,15 @@ onMounted(() => {
                       <Send v-else class="w-3.5 h-3.5 mr-1 text-primary" />
                       <span>
                         {{
-                          getStatusOfId(getPoint1SubPointId(level, selectedReligion, subIdx)) === 'none'
-                            ? 'Uji'
-                            : 'Ubah'
+                          getStatusOfId(
+                            getPoint1SubPointId(
+                              level,
+                              selectedReligion,
+                              subIdx,
+                            ),
+                          ) === "none"
+                            ? "Uji"
+                            : "Ubah"
                         }}
                       </span>
                     </Button>
@@ -620,14 +688,46 @@ onMounted(() => {
                   <td class="py-3 px-4 text-center">
                     <span
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border"
-                      :class="statusMeta[getStatusOfId(getPoint1SubPointId(level, selectedReligion, subIdx))].class"
+                      :class="
+                        statusMeta[
+                          getStatusOfId(
+                            getPoint1SubPointId(
+                              level,
+                              selectedReligion,
+                              subIdx,
+                            ),
+                          )
+                        ].class
+                      "
                     >
                       <component
-                        :is="statusMeta[getStatusOfId(getPoint1SubPointId(level, selectedReligion, subIdx))].icon"
+                        :is="
+                          statusMeta[
+                            getStatusOfId(
+                              getPoint1SubPointId(
+                                level,
+                                selectedReligion,
+                                subIdx,
+                              ),
+                            )
+                          ].icon
+                        "
                         class="w-3.5 h-3.5"
                       />
                       <span>
-                        {{ t(statusMeta[getStatusOfId(getPoint1SubPointId(level, selectedReligion, subIdx))].label) }}
+                        {{
+                          t(
+                            statusMeta[
+                              getStatusOfId(
+                                getPoint1SubPointId(
+                                  level,
+                                  selectedReligion,
+                                  subIdx,
+                                ),
+                              )
+                            ].label,
+                          )
+                        }}
                       </span>
                     </span>
                   </td>
@@ -639,20 +739,26 @@ onMounted(() => {
               <!-- ============================================== -->
               <tr v-else class="hover:bg-muted/20 transition-colors">
                 <!-- Column: No -->
-                <td class="py-4 px-4 text-center font-bold text-base text-foreground align-top">
+                <td
+                  class="py-4 px-4 text-center font-bold text-base text-foreground align-top"
+                >
                   {{ item.point_number }}
                 </td>
 
                 <!-- Column: Poin Deskripsi -->
                 <td class="py-4 px-6 align-top">
-                  <div class="mb-1">
-                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground">
+                  <!-- <div class="mb-1">
+                    <span
+                      class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground"
+                    >
                       {{ item.category }}
                     </span>
                   </div>
-                  <h4 class="font-bold text-sm text-foreground mb-1 leading-snug">
+                  <h4
+                    class="font-bold text-sm text-foreground mb-1 leading-snug"
+                  >
                     {{ item.title }}
-                  </h4>
+                  </h4> -->
                   <p class="text-xs text-muted-foreground leading-relaxed">
                     {{ item.description }}
                   </p>
@@ -679,11 +785,11 @@ onMounted(() => {
                     <Send v-else class="w-3.5 h-3.5 mr-1 text-primary" />
                     <span>
                       {{
-                        level === 'laksana' && laksanaLocked
-                          ? t('sku.lock.badge')
+                        level === "laksana" && laksanaLocked
+                          ? t("sku.lock.badge")
                           : isVerified(item.id)
-                            ? 'Ubah'
-                            : 'Ajukan'
+                            ? "Ubah"
+                            : "Ajukan"
                       }}
                     </span>
                   </Button>
@@ -699,7 +805,9 @@ onMounted(() => {
                       :is="statusMeta[getStatusOfId(item.id)].icon"
                       class="w-3.5 h-3.5"
                     />
-                    <span>{{ t(statusMeta[getStatusOfId(item.id)].label) }}</span>
+                    <span>{{
+                      t(statusMeta[getStatusOfId(item.id)].label)
+                    }}</span>
                   </span>
                 </td>
               </tr>
@@ -814,11 +922,7 @@ onMounted(() => {
           </div>
 
           <DialogFooter class="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              @click="dialogOpen = false"
-            >
+            <Button type="button" variant="outline" @click="dialogOpen = false">
               {{ t("sku.dialog.cancel") }}
             </Button>
             <Button type="submit" :disabled="!canSubmit">
@@ -826,11 +930,10 @@ onMounted(() => {
                 v-if="submitting || uploading"
                 class="w-4 h-4 mr-2 animate-spin"
               />
-              <Lock
-                v-else-if="laksanaLocked"
-                class="w-4 h-4 mr-2"
-              />
-              {{ submitting ? t("sku.dialog.sending") : t("sku.dialog.submit") }}
+              <Lock v-else-if="laksanaLocked" class="w-4 h-4 mr-2" />
+              {{
+                submitting ? t("sku.dialog.sending") : t("sku.dialog.submit")
+              }}
             </Button>
           </DialogFooter>
         </form>

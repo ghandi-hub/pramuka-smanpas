@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Traffic Light Housing -->
+  <rect x="34" y="14" width="32" height="66" rx="6" fill="#1e293b" stroke="#0f172a" stroke-width="2.5" />
+  <!-- Red Light -->
+  <circle cx="50" cy="28" r="7" fill="#ef4444" stroke="#991b1b" stroke-width="1.5" />
+  <!-- Yellow Light -->
+  <circle cx="50" cy="47" r="7" fill="#eab308" stroke="#a16207" stroke-width="1.5" />
+  <!-- Green Light -->
+  <circle cx="50" cy="66" r="7" fill="#22c55e" stroke="#15803d" stroke-width="1.5" />
+  <!-- Light visors (shades) -->
+  <path d="M34,24 Q50,20 66,24" stroke="#64748b" stroke-width="2" fill="none" />
+  <path d="M34,43 Q50,39 66,43" stroke="#64748b" stroke-width="2" fill="none" />
+  <path d="M34,62 Q50,58 66,62" stroke="#64748b" stroke-width="2" fill="none" />
+  <!-- Whistle icon at side -->
+  <g transform="translate(14, 46)">
+    <circle cx="8" cy="8" r="6" fill="#93c5fd" stroke="#1e3a8a" stroke-width="1.5" />
+    <rect x="8" y="4" width="10" height="5" fill="#93c5fd" stroke="#1e3a8a" stroke-width="1.5" />
+  </g>
+</svg>

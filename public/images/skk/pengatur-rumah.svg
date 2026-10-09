@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Window with Curtains -->
+  <rect x="28" y="14" width="44" height="34" rx="2" fill="#fee2e2" stroke="#7f1d1d" stroke-width="2" />
+  <line x1="50" y1="14" x2="50" y2="48" stroke="#7f1d1d" stroke-width="1.5" />
+  <line x1="28" y1="31" x2="72" y2="31" stroke="#7f1d1d" stroke-width="1.5" />
+  <!-- Curtains drape -->
+  <path d="M28,14 Q38,30 32,48" stroke="#b91c1c" stroke-width="2.5" fill="none" />
+  <path d="M72,14 Q62,30 68,48" stroke="#b91c1c" stroke-width="2.5" fill="none" />
+  <!-- Desk Table -->
+  <rect x="18" y="58" width="64" height="8" rx="2" fill="#fca5a5" stroke="#7f1d1d" stroke-width="2" />
+  <!-- Desk Legs -->
+  <line x1="24" y1="66" x2="24" y2="86" stroke="#7f1d1d" stroke-width="2.5" />
+  <line x1="76" y1="66" x2="76" y2="86" stroke="#7f1d1d" stroke-width="2.5" />
+  <!-- Flower Vase on table -->
+  <path d="M46,58 L45,50 Q50,48 55,50 L54,58 Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="1.5" />
+  <!-- Flower sprout -->
+  <circle cx="50" cy="44" r="3.5" fill="#facc15" stroke="#7f1d1d" stroke-width="1" />
+</svg>
